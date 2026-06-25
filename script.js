@@ -4,16 +4,13 @@
    ============================================= */
 
 /* =============================================
-   PAGE FLIP ENGINE
+   PAGE FLIP ENGINE (MODIFIED)
    ============================================= */
 const pages      = Array.from(document.querySelectorAll('.page'));
 const totalPages = pages.length;
 let currentIndex = 0;
 let isAnimating  = false;
 
-const prevBtn        = document.getElementById('prevBtn');
-const nextBtn        = document.getElementById('nextBtn');
-const dotNavEl       = document.getElementById('dotNav');
 const currentPageEl  = document.getElementById('currentPage');
 const totalPagesEl   = document.getElementById('totalPages');
 const chapterTitleEl = document.getElementById('navChapterTitle');
@@ -21,6 +18,7 @@ const chapterTitleEl = document.getElementById('navChapterTitle');
 if (totalPagesEl) totalPagesEl.textContent = totalPages;
 
 /* ---- Build dot nav ---- */
+const dotNavEl = document.getElementById('dotNav');
 pages.forEach((_, i) => {
   const dot = document.createElement('button');
   dot.className = 'dot-nav__dot' + (i === 0 ? ' active' : '');
@@ -41,13 +39,22 @@ function updateUI(index) {
 
   getDots().forEach((d, i) => d.classList.toggle('active', i === index));
 
-  prevBtn.disabled = (index === 0);
-  nextBtn.disabled = (index === totalPages - 1);
-
   /* Update drawer active link */
   document.querySelectorAll('.drawer__link').forEach((l, i) => {
     l.classList.toggle('active', i === index);
   });
+
+  /* Update Next button visibility */
+  const nextBtn = document.getElementById('nextPageBtn');
+  if (nextBtn) {
+    nextBtn.style.display = (index === totalPages - 1) ? 'none' : 'flex';
+  }
+
+  /* Update footer visibility - show on all pages */
+  const footer = document.querySelector('.page__footer');
+  if (footer) {
+    footer.style.display = 'block';
+  }
 }
 
 function goToPage(targetIndex) {
@@ -64,24 +71,19 @@ function goToPage(targetIndex) {
   target.classList.remove('is-active', 'is-leaving-up', 'is-entering-from-top');
 
   if (goingForward) {
-    /* Target starts below → slides up */
     target.style.transform = 'translateY(100%)';
     target.style.opacity   = '0';
   } else {
-    /* Target starts above → slides down */
     target.style.transform = 'translateY(-100%)';
     target.style.opacity   = '0';
   }
 
-  /* Force reflow so the starting position registers */
   target.getBoundingClientRect();
 
-  /* Activate target (CSS transition kicks in) */
   target.style.transform = '';
   target.style.opacity   = '';
   target.classList.add('is-active');
 
-  /* Push current page out */
   current.classList.remove('is-active');
   if (goingForward) {
     current.style.transform = 'translateY(-100%)';
@@ -94,13 +96,10 @@ function goToPage(targetIndex) {
   currentIndex = targetIndex;
   updateUI(currentIndex);
 
-  /* Clean up after animation */
   setTimeout(() => {
     current.style.transform = '';
     current.style.opacity   = '';
     isAnimating = false;
-
-    /* Scroll new page back to top */
     target.scrollTop = 0;
   }, 700);
 }
@@ -118,7 +117,6 @@ function goToPage(targetIndex) {
       p.style.opacity   = '0';
     }
   });
-  /* Re-enable transitions after a frame */
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       pages.forEach(p => { p.style.transition = ''; });
@@ -127,61 +125,15 @@ function goToPage(targetIndex) {
   updateUI(0);
 })();
 
-/* ---- Arrow buttons ---- */
-prevBtn.addEventListener('click', () => goToPage(currentIndex - 1));
-nextBtn.addEventListener('click', () => goToPage(currentIndex + 1));
-
-/* ---- Keyboard navigation ---- */
-document.addEventListener('keydown', e => {
-  if (['ArrowDown', 'PageDown'].includes(e.key)) { e.preventDefault(); goToPage(currentIndex + 1); }
-  if (['ArrowUp',   'PageUp'  ].includes(e.key)) { e.preventDefault(); goToPage(currentIndex - 1); }
+/* ---- Next Page Button ---- */
+document.addEventListener('DOMContentLoaded', function() {
+  const nextBtn = document.getElementById('nextPageBtn');
+  if (nextBtn) {
+    nextBtn.addEventListener('click', function() {
+      goToPage(currentIndex + 1);
+    });
+  }
 });
-
-/* ---- Touch / swipe navigation ---- */
-let touchStartY = 0;
-let touchStartTime = 0;
-
-document.addEventListener('touchstart', e => {
-  touchStartY    = e.touches[0].clientY;
-  touchStartTime = Date.now();
-}, { passive: true });
-
-document.addEventListener('touchend', e => {
-  const deltaY    = touchStartY - e.changedTouches[0].clientY;
-  const deltaTime = Date.now() - touchStartTime;
-  const activePage = pages[currentIndex];
-
-  /* Only trigger page flip if: fast swipe OR large movement AND page at scroll edge */
-  const atTop    = activePage.scrollTop <= 0;
-  const atBottom = activePage.scrollTop + activePage.clientHeight >= activePage.scrollHeight - 2;
-
-  const isFastSwipe = Math.abs(deltaY) > 40 && deltaTime < 350;
-  const isBigSwipe  = Math.abs(deltaY) > 120;
-
-  if (isFastSwipe || isBigSwipe) {
-    if (deltaY > 0 && atBottom) { goToPage(currentIndex + 1); }
-    if (deltaY < 0 && atTop)    { goToPage(currentIndex - 1); }
-  }
-}, { passive: true });
-
-/* ---- Mouse wheel navigation ---- */
-let wheelCooldown = false;
-document.addEventListener('wheel', e => {
-  if (wheelCooldown || isAnimating) return;
-  const activePage = pages[currentIndex];
-  const atTop    = activePage.scrollTop <= 0;
-  const atBottom = activePage.scrollTop + activePage.clientHeight >= activePage.scrollHeight - 2;
-
-  if (e.deltaY > 30 && atBottom) {
-    goToPage(currentIndex + 1);
-    wheelCooldown = true;
-    setTimeout(() => { wheelCooldown = false; }, 800);
-  } else if (e.deltaY < -30 && atTop) {
-    goToPage(currentIndex - 1);
-    wheelCooldown = true;
-    setTimeout(() => { wheelCooldown = false; }, 800);
-  }
-}, { passive: true });
 
 /* ---- Data-page links (any element with data-page="N") ---- */
 document.querySelectorAll('[data-page]').forEach(el => {
@@ -201,10 +153,18 @@ if (scrollHint) {
 }
 
 /* ---- Logo click → cover ---- */
-document.querySelector('.nav__logo').addEventListener('click', e => {
-  e.preventDefault();
-  goToPage(0);
-});
+const logo = document.querySelector('.nav__logo');
+if (logo) {
+  logo.addEventListener('click', e => {
+    e.preventDefault();
+    goToPage(0);
+  });
+}
+
+/* =============================================
+   REMOVED: Wheel navigation, Swipe navigation, Arrow buttons
+   ============================================= */
+/* All scroll/touch/wheel navigation has been removed as requested */
 
 
 /* =============================================
@@ -228,13 +188,13 @@ function closeDrawer() {
   hamburger.setAttribute('aria-expanded', 'false');
 }
 
-hamburger.addEventListener('click', () => {
-  drawer.classList.contains('open') ? closeDrawer() : openDrawer();
-});
-drawerClose.addEventListener('click', closeDrawer);
-drawerOverlay.addEventListener('click', closeDrawer);
-
-/* Drawer links already handled by [data-page] above */
+if (hamburger) {
+  hamburger.addEventListener('click', () => {
+    drawer.classList.contains('open') ? closeDrawer() : openDrawer();
+  });
+}
+if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
+if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
 
 
 /* =============================================
@@ -318,6 +278,146 @@ if (greetBtn) greetBtn.addEventListener('click', showGreeting);
 
 
 /* =============================================
+   SKILL POPUP / MODAL SYSTEM
+   ============================================= */
+
+/* ---- Skill descriptions ---- */
+const skillDescriptions = {
+  'C#': 'C# (C-Sharp) is a modern, object-oriented programming language developed by Microsoft. It\'s widely used for building Windows desktop applications, web services, and games using the Unity game engine. I use C# to create robust backend services and cross-platform applications.',
+  
+  'C': 'C is a powerful low-level programming language that provides direct access to memory and hardware. It\'s the foundation of many operating systems and embedded systems. I work with C for system-level programming and understanding how computers work at a fundamental level.',
+  
+  'Java': 'Java is a versatile, object-oriented programming language known for its "write once, run anywhere" capability. It\'s extensively used for enterprise applications, Android development, and large-scale systems. I use Java to build scalable, platform-independent applications.',
+  
+  'HTML': 'HTML (HyperText Markup Language) is the standard markup language for creating web pages. It provides the structural foundation of every website. I use HTML to create semantic, accessible, and SEO-friendly web content.',
+  
+  'CSS': 'CSS (Cascading Style Sheets) is used to style and layout web pages. It controls colors, typography, spacing, and responsive design. I use CSS to create beautiful, responsive interfaces that work across all devices.',
+  
+  'JavaScript': 'JavaScript is a dynamic programming language that brings interactivity to websites. It powers the modern web and can be used for both frontend and backend development. I use JavaScript to build interactive, responsive, and engaging web applications.',
+  
+  'Python': 'Python is a high-level, interpreted programming language known for its readability and versatility. It\'s used in web development, data analysis, AI, and automation. I use Python for backend development, scripting, and data processing.',
+  
+  'SQL': 'SQL (Structured Query Language) is used to manage and manipulate relational databases. It\'s essential for storing, retrieving, and analyzing data. I use SQL to design efficient database schemas and write complex queries for data-driven applications.',
+  
+  'Full Stack Dev': 'Full Stack Development involves working on both the frontend (client-side) and backend (server-side) of web applications. It requires knowledge of databases, servers, APIs, and user interfaces. I bring together all layers of web development to create complete, functional products.',
+  
+  'Adobe Photoshop': 'Adobe Photoshop is a powerful image editing and design software used for photo manipulation, graphic design, and digital art. I use Photoshop for creating visual assets, editing images, and designing marketing materials.',
+  
+  'Adobe Illustrator': 'Adobe Illustrator is a vector graphics editor used for creating logos, icons, illustrations, and typography. I use Illustrator to design scalable graphics that maintain quality at any size.',
+  
+  'Adobe After Effects': 'Adobe After Effects is a digital visual effects and motion graphics software. I use it to create animations, transitions, and visual effects for web and video content.',
+  
+  'UI Design': 'UI (User Interface) Design focuses on creating visually appealing, intuitive, and user-friendly interfaces for digital products. I design interfaces that are both beautiful and functional, prioritizing user experience and accessibility.',
+  
+  'Hardware & Circuits': 'Understanding hardware and circuits gives me insight into how software interacts with physical systems. I work with microcontrollers, sensors, and basic electronics to create integrated hardware-software solutions.',
+  
+  'System Engineering': 'System Engineering involves designing, implementing, and maintaining complex systems that integrate hardware, software, and processes. I approach problems holistically, considering how all components work together.',
+  
+  'BPO / Customer Service': 'Business Process Outsourcing (BPO) and Customer Service involve managing customer interactions and business processes for other companies. My experience includes handling inquiries, resolving issues, and maintaining high customer satisfaction.',
+  
+  'Telecommunications': 'Telecommunications involves managing communication systems, networks, and services. My experience includes supporting customers with technical issues, billing questions, and service-related concerns in the telecom industry.',
+  
+  'Healthcare Support': 'Healthcare support involves assisting patients and providers with healthcare services, insurance, and medical information. I ensure patients receive the support they need while maintaining privacy and compliance.',
+  
+  'E-Commerce': 'E-Commerce involves managing online retail platforms, processing orders, and supporting digital transactions. I have experience across multiple platforms including Cartpanda, Buygoods, DigiStore, and Shopify.',
+  
+  'Persuasive Communication': 'Persuasive Communication is the art of presenting ideas clearly and convincingly to influence decisions. I use this skill to build consensus, negotiate effectively, and present technical concepts to non-technical audiences.',
+  
+  'MS Office Suite': 'Microsoft Office Suite includes Word, Excel, PowerPoint, and other productivity tools. I use these for documentation, data analysis, presentations, and professional communication.'
+};
+
+/* ---- Create Modal ---- */
+function createSkillModal() {
+  // Check if modal already exists
+  if (document.getElementById('skillModal')) return;
+
+  const modal = document.createElement('div');
+  modal.id = 'skillModal';
+  modal.className = 'skill-modal';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.style.display = 'none';
+
+  modal.innerHTML = `
+    <div class="skill-modal__overlay" id="skillModalOverlay"></div>
+    <div class="skill-modal__box">
+      <button class="skill-modal__close" id="skillModalClose" aria-label="Close popup">&times;</button>
+      <h3 class="skill-modal__title" id="skillModalTitle">Skill</h3>
+      <p class="skill-modal__desc" id="skillModalDesc">Description goes here.</p>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  // Close handlers
+  const closeBtn = document.getElementById('skillModalClose');
+  const overlay = document.getElementById('skillModalOverlay');
+
+  function closeModal() {
+    const modalEl = document.getElementById('skillModal');
+    if (modalEl) modalEl.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (overlay) overlay.addEventListener('click', closeModal);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const modalEl = document.getElementById('skillModal');
+      if (modalEl && modalEl.style.display === 'block') closeModal();
+    }
+  });
+}
+
+/* ---- Show skill popup ---- */
+function showSkillPopup(skillName) {
+  createSkillModal();
+
+  const modal = document.getElementById('skillModal');
+  const title = document.getElementById('skillModalTitle');
+  const desc  = document.getElementById('skillModalDesc');
+
+  if (!modal || !title || !desc) return;
+
+  const description = skillDescriptions[skillName] || `${skillName} is a valuable skill in my toolkit.`;
+
+  title.textContent = skillName;
+  desc.textContent = description;
+
+  modal.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+/* ---- Attach click events to skill tags ---- */
+document.addEventListener('DOMContentLoaded', function() {
+  const skillTags = document.querySelectorAll('.skill-tag');
+  skillTags.forEach(tag => {
+    tag.style.cursor = 'pointer';
+    tag.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const skillName = this.textContent.trim();
+      showSkillPopup(skillName);
+    });
+  });
+});
+
+/* ---- Also handle dynamically added skill tags (if any) ---- */
+const skillObserver = new MutationObserver(() => {
+  document.querySelectorAll('.skill-tag:not([data-listener])').forEach(tag => {
+    tag.setAttribute('data-listener', 'true');
+    tag.style.cursor = 'pointer';
+    tag.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const skillName = this.textContent.trim();
+      showSkillPopup(skillName);
+    });
+  });
+});
+skillObserver.observe(document.body, { childList: true, subtree: true });
+
+
+/* =============================================
    NAV SCROLL SHADOW
    ============================================= */
 const nav = document.getElementById('nav');
@@ -325,4 +425,24 @@ pages.forEach(p => {
   p.addEventListener('scroll', () => {
     nav.classList.toggle('scrolled', p.scrollTop > 10);
   }, { passive: true });
+});
+
+
+/* =============================================
+   FOOTER VISIBILITY - Ensure footer shows on all pages
+   ============================================= */
+document.addEventListener('DOMContentLoaded', function() {
+  const footer = document.querySelector('.page__footer');
+  if (footer) {
+    footer.style.display = 'block';
+  }
+
+  // Also ensure it shows when page changes
+  const observer = new MutationObserver(() => {
+    const footerEl = document.querySelector('.page__footer');
+    if (footerEl) {
+      footerEl.style.display = 'block';
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
 });
