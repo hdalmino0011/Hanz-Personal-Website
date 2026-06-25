@@ -599,6 +599,11 @@ ul { list-style: none; }
 .contact-card__icon {
   font-size: 1.5rem;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--teal);
+  width: 28px;
 }
 .contact-card__info {
   display: flex;
