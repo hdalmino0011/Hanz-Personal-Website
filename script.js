@@ -1,10 +1,10 @@
 /* =============================================
    HANZ DEE DALMINO — PORTFOLIO SCRIPTS
-   Page-flip / article-chapter edition
+   Enhanced edition
    ============================================= */
 
 /* =============================================
-   PAGE FLIP ENGINE (MODIFIED)
+   PAGE FLIP ENGINE
    ============================================= */
 const pages      = Array.from(document.querySelectorAll('.page'));
 const totalPages = pages.length;
@@ -32,29 +32,21 @@ function getDots() {
 }
 
 function updateUI(index) {
-  currentPageEl.textContent = index + 1;
+  if (currentPageEl) currentPageEl.textContent = index + 1;
 
   const chapterTitle = pages[index].dataset.chapter || '';
-  chapterTitleEl.textContent = index > 0 ? chapterTitle : '';
+  if (chapterTitleEl) chapterTitleEl.textContent = index > 0 ? chapterTitle : '';
 
   getDots().forEach((d, i) => d.classList.toggle('active', i === index));
 
-  /* Update drawer active link */
   document.querySelectorAll('.drawer__link').forEach((l, i) => {
     l.classList.toggle('active', i === index);
   });
 
-  /* Update Next button visibility */
-  const nextBtn = document.getElementById('nextPageBtn');
-  if (nextBtn) {
-    nextBtn.style.display = (index === totalPages - 1) ? 'none' : 'flex';
-  }
-
-  /* Update footer visibility - show on all pages */
-  const footer = document.querySelector('.page__footer');
-  if (footer) {
-    footer.style.display = 'block';
-  }
+  /* Update all next-page buttons */
+  document.querySelectorAll('[data-next]').forEach(btn => {
+    btn.style.display = (index === totalPages - 1) ? 'none' : 'flex';
+  });
 }
 
 function goToPage(targetIndex) {
@@ -67,31 +59,23 @@ function goToPage(targetIndex) {
   const current = pages[currentIndex];
   const target  = pages[targetIndex];
 
-  /* Position target ready to enter */
-  target.classList.remove('is-active', 'is-leaving-up', 'is-entering-from-top');
+  /* Set target start position */
+  target.classList.remove('is-active', 'is-leaving-up');
+  target.style.transition = 'none';
+  target.style.transform  = goingForward ? 'translateY(100%)' : 'translateY(-100%)';
+  target.style.opacity    = '0';
 
-  if (goingForward) {
-    target.style.transform = 'translateY(100%)';
-    target.style.opacity   = '0';
-  } else {
-    target.style.transform = 'translateY(-100%)';
-    target.style.opacity   = '0';
-  }
+  target.getBoundingClientRect(); /* force reflow */
 
-  target.getBoundingClientRect();
-
-  target.style.transform = '';
-  target.style.opacity   = '';
+  target.style.transition = '';
+  target.style.transform  = '';
+  target.style.opacity    = '';
   target.classList.add('is-active');
 
+  /* Exit current */
   current.classList.remove('is-active');
-  if (goingForward) {
-    current.style.transform = 'translateY(-100%)';
-    current.style.opacity   = '0';
-  } else {
-    current.style.transform = 'translateY(100%)';
-    current.style.opacity   = '0';
-  }
+  current.style.transform = goingForward ? 'translateY(-100%)' : 'translateY(100%)';
+  current.style.opacity   = '0';
 
   currentIndex = targetIndex;
   updateUI(currentIndex);
@@ -100,7 +84,9 @@ function goToPage(targetIndex) {
     current.style.transform = '';
     current.style.opacity   = '';
     isAnimating = false;
-    target.scrollTop = 0;
+    /* Reset scroll of entered page */
+    const scrollArea = target.querySelector('.page__scroll-area');
+    if (scrollArea) scrollArea.scrollTop = 0;
   }, 700);
 }
 
@@ -125,17 +111,14 @@ function goToPage(targetIndex) {
   updateUI(0);
 })();
 
-/* ---- Next Page Button ---- */
-document.addEventListener('DOMContentLoaded', function() {
-  const nextBtn = document.getElementById('nextPageBtn');
-  if (nextBtn) {
-    nextBtn.addEventListener('click', function() {
-      goToPage(currentIndex + 1);
-    });
+/* ---- Next buttons (data-next) ---- */
+document.addEventListener('click', function(e) {
+  if (e.target.closest('[data-next]')) {
+    goToPage(currentIndex + 1);
   }
 });
 
-/* ---- Data-page links (any element with data-page="N") ---- */
+/* ---- Data-page links ---- */
 document.querySelectorAll('[data-page]').forEach(el => {
   el.addEventListener('click', e => {
     const idx = parseInt(el.dataset.page);
@@ -146,26 +129,29 @@ document.querySelectorAll('[data-page]').forEach(el => {
   });
 });
 
-/* ---- Scroll hint click ---- */
+/* ---- Scroll hint ---- */
 const scrollHint = document.getElementById('scrollHint');
-if (scrollHint) {
-  scrollHint.addEventListener('click', () => goToPage(1));
-}
+if (scrollHint) scrollHint.addEventListener('click', () => goToPage(1));
 
-/* ---- Logo click → cover ---- */
-const logo = document.querySelector('.nav__logo');
-if (logo) {
-  logo.addEventListener('click', e => {
+/* ---- Logo ---- */
+const logoEl = document.querySelector('.nav__logo');
+if (logoEl) {
+  logoEl.addEventListener('click', e => {
     e.preventDefault();
     goToPage(0);
   });
 }
 
-/* =============================================
-   REMOVED: Wheel navigation, Swipe navigation, Arrow buttons
-   ============================================= */
-/* All scroll/touch/wheel navigation has been removed as requested */
-
+/* ---- Nav shadow on page scroll ---- */
+const navEl = document.getElementById('nav');
+pages.forEach(p => {
+  const scrollArea = p.querySelector('.page__scroll-area');
+  if (scrollArea) {
+    scrollArea.addEventListener('scroll', () => {
+      navEl.classList.toggle('scrolled', scrollArea.scrollTop > 10);
+    }, { passive: true });
+  }
+});
 
 /* =============================================
    MOBILE DRAWER
@@ -188,14 +174,9 @@ function closeDrawer() {
   hamburger.setAttribute('aria-expanded', 'false');
 }
 
-if (hamburger) {
-  hamburger.addEventListener('click', () => {
-    drawer.classList.contains('open') ? closeDrawer() : openDrawer();
-  });
-}
+if (hamburger) hamburger.addEventListener('click', () => drawer.classList.contains('open') ? closeDrawer() : openDrawer());
 if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
 if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
-
 
 /* =============================================
    TYPEWRITER EFFECT
@@ -208,10 +189,10 @@ const roles = [
   'Problem Solver'
 ];
 
-let roleIndex = 0;
-let charIndex = 0;
+let roleIndex  = 0;
+let charIndex  = 0;
 let isDeleting = false;
-const typedEl = document.getElementById('typedRole');
+const typedEl  = document.getElementById('typedRole');
 
 function typeWriter() {
   if (!typedEl) return;
@@ -225,22 +206,21 @@ function typeWriter() {
     charIndex++;
   }
 
-  let delay = isDeleting ? 60 : 100;
+  let delay = isDeleting ? 58 : 98;
 
   if (!isDeleting && charIndex === currentRole.length) {
     delay = 1800;
     isDeleting = true;
   } else if (isDeleting && charIndex === 0) {
     isDeleting = false;
-    roleIndex = (roleIndex + 1) % roles.length;
-    delay = 400;
+    roleIndex  = (roleIndex + 1) % roles.length;
+    delay = 380;
   }
 
   setTimeout(typeWriter, delay);
 }
 
 setTimeout(typeWriter, 900);
-
 
 /* =============================================
    GREETING BUTTON
@@ -270,179 +250,72 @@ function showGreeting() {
   greetingBox.style.opacity = '0';
   setTimeout(() => {
     greetingBox.textContent = greetings[idx];
+    greetingBox.classList.add('visible');
     greetingBox.style.opacity = '1';
   }, 200);
 }
 
 if (greetBtn) greetBtn.addEventListener('click', showGreeting);
 
-
 /* =============================================
    SKILL POPUP / MODAL SYSTEM
    ============================================= */
-
-/* ---- Skill descriptions ---- */
 const skillDescriptions = {
-  'C#': 'C# (C-Sharp) is a modern, object-oriented programming language developed by Microsoft. It\'s widely used for building Windows desktop applications, web services, and games using the Unity game engine. I use C# to create robust backend services and cross-platform applications.',
-  
-  'C': 'C is a powerful low-level programming language that provides direct access to memory and hardware. It\'s the foundation of many operating systems and embedded systems. I work with C for system-level programming and understanding how computers work at a fundamental level.',
-  
-  'Java': 'Java is a versatile, object-oriented programming language known for its "write once, run anywhere" capability. It\'s extensively used for enterprise applications, Android development, and large-scale systems. I use Java to build scalable, platform-independent applications.',
-  
-  'HTML': 'HTML (HyperText Markup Language) is the standard markup language for creating web pages. It provides the structural foundation of every website. I use HTML to create semantic, accessible, and SEO-friendly web content.',
-  
-  'CSS': 'CSS (Cascading Style Sheets) is used to style and layout web pages. It controls colors, typography, spacing, and responsive design. I use CSS to create beautiful, responsive interfaces that work across all devices.',
-  
-  'JavaScript': 'JavaScript is a dynamic programming language that brings interactivity to websites. It powers the modern web and can be used for both frontend and backend development. I use JavaScript to build interactive, responsive, and engaging web applications.',
-  
-  'Python': 'Python is a high-level, interpreted programming language known for its readability and versatility. It\'s used in web development, data analysis, AI, and automation. I use Python for backend development, scripting, and data processing.',
-  
-  'SQL': 'SQL (Structured Query Language) is used to manage and manipulate relational databases. It\'s essential for storing, retrieving, and analyzing data. I use SQL to design efficient database schemas and write complex queries for data-driven applications.',
-  
-  'Full Stack Dev': 'Full Stack Development involves working on both the frontend (client-side) and backend (server-side) of web applications. It requires knowledge of databases, servers, APIs, and user interfaces. I bring together all layers of web development to create complete, functional products.',
-  
-  'Adobe Photoshop': 'Adobe Photoshop is a powerful image editing and design software used for photo manipulation, graphic design, and digital art. I use Photoshop for creating visual assets, editing images, and designing marketing materials.',
-  
-  'Adobe Illustrator': 'Adobe Illustrator is a vector graphics editor used for creating logos, icons, illustrations, and typography. I use Illustrator to design scalable graphics that maintain quality at any size.',
-  
-  'Adobe After Effects': 'Adobe After Effects is a digital visual effects and motion graphics software. I use it to create animations, transitions, and visual effects for web and video content.',
-  
-  'UI Design': 'UI (User Interface) Design focuses on creating visually appealing, intuitive, and user-friendly interfaces for digital products. I design interfaces that are both beautiful and functional, prioritizing user experience and accessibility.',
-  
-  'Hardware & Circuits': 'Understanding hardware and circuits gives me insight into how software interacts with physical systems. I work with microcontrollers, sensors, and basic electronics to create integrated hardware-software solutions.',
-  
-  'System Engineering': 'System Engineering involves designing, implementing, and maintaining complex systems that integrate hardware, software, and processes. I approach problems holistically, considering how all components work together.',
-  
-  'BPO / Customer Service': 'Business Process Outsourcing (BPO) and Customer Service involve managing customer interactions and business processes for other companies. My experience includes handling inquiries, resolving issues, and maintaining high customer satisfaction.',
-  
-  'Telecommunications': 'Telecommunications involves managing communication systems, networks, and services. My experience includes supporting customers with technical issues, billing questions, and service-related concerns in the telecom industry.',
-  
-  'Healthcare Support': 'Healthcare support involves assisting patients and providers with healthcare services, insurance, and medical information. I ensure patients receive the support they need while maintaining privacy and compliance.',
-  
-  'E-Commerce': 'E-Commerce involves managing online retail platforms, processing orders, and supporting digital transactions. I have experience across multiple platforms including Cartpanda, Buygoods, DigiStore, and Shopify.',
-  
-  'Persuasive Communication': 'Persuasive Communication is the art of presenting ideas clearly and convincingly to influence decisions. I use this skill to build consensus, negotiate effectively, and present technical concepts to non-technical audiences.',
-  
-  'MS Office Suite': 'Microsoft Office Suite includes Word, Excel, PowerPoint, and other productivity tools. I use these for documentation, data analysis, presentations, and professional communication.'
+  'C#': 'C# (C-Sharp) is a modern, object-oriented language developed by Microsoft. It\'s used for Windows apps, web services, and games built on Unity. I use it to create robust backend services and cross-platform applications.',
+  'C': 'C is a powerful low-level language that gives direct access to memory and hardware. It\'s the foundation of many operating systems. I use C for system-level programming and embedded logic.',
+  'Java': 'Java is a versatile, object-oriented language known for its "write once, run anywhere" capability. I use Java to build scalable, platform-independent applications.',
+  'HTML': 'HTML is the structural backbone of every web page. I write semantic, accessible, SEO-friendly markup that works as a solid foundation for any UI.',
+  'CSS': 'CSS controls layout, typography, color, and responsiveness. I use it to craft polished, mobile-first interfaces that feel great on any device.',
+  'JavaScript': 'JavaScript brings interactivity to the web and powers both frontend and backend via Node.js. I use it to build dynamic, engaging applications.',
+  'Python': 'Python\'s readability and versatility make it great for web development, automation, and data work. I use it for scripting, APIs, and data processing.',
+  'SQL': 'SQL is the language of relational databases. I write efficient schemas and complex queries to power data-driven applications.',
+  'Full Stack Dev': 'Full Stack Development means owning both the frontend and backend. I connect the user interface to servers, databases, and APIs to deliver complete products.',
+  'Adobe Photoshop': 'Photoshop is my go-to for photo editing, compositing, and raster graphic design — creating visual assets that look polished at every resolution.',
+  'Adobe Illustrator': 'Illustrator handles vector graphics — logos, icons, and illustrations — so designs scale crisply from a favicon to a billboard.',
+  'Adobe After Effects': 'After Effects lets me create motion graphics, animated transitions, and visual effects for web and video content.',
+  'UI Design': 'UI Design is about making interfaces intuitive and beautiful. I design with both aesthetics and accessibility in mind, ensuring every screen serves its user.',
+  'Hardware & Circuits': 'Understanding hardware gives me insight into how software talks to physical systems — from microcontrollers to sensors to integrated electronics.',
+  'System Engineering': 'System Engineering is the holistic practice of designing and managing complex systems where hardware, software, and processes intersect.',
+  'BPO / Customer Service': 'Three years in BPO sharpened my communication, empathy, and problem-solving — skills that directly inform how I think about user needs in my software.',
+  'Telecommunications': 'Supporting telecom customers gave me hands-on knowledge of networking concepts, billing systems, and service workflows.',
+  'Healthcare Support': 'Working in healthcare BPO taught me HIPAA-adjacent data sensitivity and the high stakes of clear, accurate patient communication.',
+  'E-Commerce': 'I\'ve supported orders and disputes across Cartpanda, Buygoods, DigiStore, and Shopify — giving me practical insight into digital commerce flows.',
+  'Persuasive Communication': 'Whether pitching a design, explaining a technical decision, or de-escalating a customer, clear and compelling communication is the skill that makes everything else land.',
+  'MS Office Suite': 'Word for documentation, Excel for data analysis and reporting, PowerPoint for presentations — I use the Office suite efficiently for professional deliverables.'
 };
 
-/* ---- Create Modal ---- */
-function createSkillModal() {
-  // Check if modal already exists
-  if (document.getElementById('skillModal')) return;
+const skillModal      = document.getElementById('skillModal');
+const skillModalTitle = document.getElementById('skillModalTitle');
+const skillModalDesc  = document.getElementById('skillModalDesc');
+const skillModalClose = document.getElementById('skillModalClose');
+const skillModalOverlay = document.getElementById('skillModalOverlay');
 
-  const modal = document.createElement('div');
-  modal.id = 'skillModal';
-  modal.className = 'skill-modal';
-  modal.setAttribute('role', 'dialog');
-  modal.setAttribute('aria-modal', 'true');
-  modal.style.display = 'none';
-
-  modal.innerHTML = `
-    <div class="skill-modal__overlay" id="skillModalOverlay"></div>
-    <div class="skill-modal__box">
-      <button class="skill-modal__close" id="skillModalClose" aria-label="Close popup">&times;</button>
-      <h3 class="skill-modal__title" id="skillModalTitle">Skill</h3>
-      <p class="skill-modal__desc" id="skillModalDesc">Description goes here.</p>
-    </div>
-  `;
-
-  document.body.appendChild(modal);
-
-  // Close handlers
-  const closeBtn = document.getElementById('skillModalClose');
-  const overlay = document.getElementById('skillModalOverlay');
-
-  function closeModal() {
-    const modalEl = document.getElementById('skillModal');
-    if (modalEl) modalEl.style.display = 'none';
-    document.body.style.overflow = '';
-  }
-
-  if (closeBtn) closeBtn.addEventListener('click', closeModal);
-  if (overlay) overlay.addEventListener('click', closeModal);
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      const modalEl = document.getElementById('skillModal');
-      if (modalEl && modalEl.style.display === 'block') closeModal();
-    }
-  });
-}
-
-/* ---- Show skill popup ---- */
-function showSkillPopup(skillName) {
-  createSkillModal();
-
-  const modal = document.getElementById('skillModal');
-  const title = document.getElementById('skillModalTitle');
-  const desc  = document.getElementById('skillModalDesc');
-
-  if (!modal || !title || !desc) return;
-
-  const description = skillDescriptions[skillName] || `${skillName} is a valuable skill in my toolkit.`;
-
-  title.textContent = skillName;
-  desc.textContent = description;
-
-  modal.style.display = 'block';
+function openSkillModal(name) {
+  if (!skillModal) return;
+  skillModalTitle.textContent = name;
+  skillModalDesc.textContent  = skillDescriptions[name] || `${name} is a key part of my toolkit.`;
+  skillModal.classList.add('open');
+  skillModal.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
 }
 
-/* ---- Attach click events to skill tags ---- */
-document.addEventListener('DOMContentLoaded', function() {
-  const skillTags = document.querySelectorAll('.skill-tag');
-  skillTags.forEach(tag => {
-    tag.style.cursor = 'pointer';
-    tag.addEventListener('click', function(e) {
-      e.stopPropagation();
-      const skillName = this.textContent.trim();
-      showSkillPopup(skillName);
-    });
-  });
+function closeSkillModal() {
+  if (!skillModal) return;
+  skillModal.classList.remove('open');
+  skillModal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+}
+
+if (skillModalClose) skillModalClose.addEventListener('click', closeSkillModal);
+if (skillModalOverlay) skillModalOverlay.addEventListener('click', closeSkillModal);
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && skillModal && skillModal.classList.contains('open')) closeSkillModal();
 });
 
-/* ---- Also handle dynamically added skill tags (if any) ---- */
-const skillObserver = new MutationObserver(() => {
-  document.querySelectorAll('.skill-tag:not([data-listener])').forEach(tag => {
-    tag.setAttribute('data-listener', 'true');
-    tag.style.cursor = 'pointer';
-    tag.addEventListener('click', function(e) {
-      e.stopPropagation();
-      const skillName = this.textContent.trim();
-      showSkillPopup(skillName);
-    });
+/* Attach to all skill tags */
+document.querySelectorAll('.skill-tag').forEach(tag => {
+  tag.addEventListener('click', e => {
+    e.stopPropagation();
+    openSkillModal(tag.textContent.trim());
   });
-});
-skillObserver.observe(document.body, { childList: true, subtree: true });
-
-
-/* =============================================
-   NAV SCROLL SHADOW
-   ============================================= */
-const nav = document.getElementById('nav');
-pages.forEach(p => {
-  p.addEventListener('scroll', () => {
-    nav.classList.toggle('scrolled', p.scrollTop > 10);
-  }, { passive: true });
-});
-
-
-/* =============================================
-   FOOTER VISIBILITY - Ensure footer shows on all pages
-   ============================================= */
-document.addEventListener('DOMContentLoaded', function() {
-  const footer = document.querySelector('.page__footer');
-  if (footer) {
-    footer.style.display = 'block';
-  }
-
-  // Also ensure it shows when page changes
-  const observer = new MutationObserver(() => {
-    const footerEl = document.querySelector('.page__footer');
-    if (footerEl) {
-      footerEl.style.display = 'block';
-    }
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
 });
