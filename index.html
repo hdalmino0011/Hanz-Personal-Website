@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hanz Dee Dalmino — Web Developer & System Engineer</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <div class="nav__logo">HDD</div>
+    <button class="nav__hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav__links" id="navLinks">
+      <li><a href="#about" class="nav__link">About</a></li>
+      <li><a href="#skills" class="nav__link">Skills</a></li>
+      <li><a href="#experience" class="nav__link">Experience</a></li>
+      <li><a href="#education" class="nav__link">Education</a></li>
+      <li><a href="#contact" class="nav__link">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero__bg-shape"></div>
+    <div class="hero__content">
+      <p class="hero__eyebrow">Based in Talisay City, Cebu, Philippines</p>
+      <h1 class="hero__name">Hanz Dee<br /><em>Dalmino</em></h1>
+      <div class="hero__role">
+        <span class="hero__role-prefix">I build as a&nbsp;</span>
+        <span class="hero__role-typed" id="typedRole"></span>
+        <span class="hero__role-cursor">|</span>
+      </div>
+      <p class="hero__tagline">
+        Full-stack developer &amp; UI designer who bridges clean code<br class="br-desktop" />
+        with creative systems — from pixels to circuits.
+      </p>
+      <div class="hero__actions">
+        <button class="btn btn--primary" id="greetBtn">Say Hello 👋</button>
+        <a href="#contact" class="btn btn--outline">Get in Touch</a>
+      </div>
+      <div class="hero__greeting-box" id="greetingBox" aria-live="polite"></div>
+    </div>
+    <div class="hero__deco">
+      <div class="hero__deco-ring hero__deco-ring--1"></div>
+      <div class="hero__deco-ring hero__deco-ring--2"></div>
+      <div class="hero__deco-ring hero__deco-ring--3"></div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section about" id="about">
+    <div class="container">
+      <div class="section__header">
+        <span class="section__label">Who I Am</span>
+        <h2 class="section__title">About Me</h2>
+      </div>
+      <div class="about__body">
+        <div class="about__text">
+          <p>
+            I'm a <strong>Web Developer and System Engineer</strong> with a passion for
+            crafting digital experiences that are as functional as they are beautiful.
+            My background spans frontend and backend development, UI/UX design,
+            hardware systems, and customer service — giving me an unusually broad
+            perspective on how technology serves real people.
+          </p>
+          <p>
+            Educated at <strong>Cebu Technological University</strong> in Bachelor of
+            Science in Information Technology, I continuously sharpen my skills across
+            the full product lifecycle — from writing code to designing interfaces to
+            understanding the hardware beneath it all.
+          </p>
+          <p>
+            Outside of coding, I work with design tools like Adobe Photoshop,
+            Illustrator, and After Effects, blending the technical and creative in
+            everything I build.
+          </p>
+        </div>
+        <div class="about__highlights">
+          <div class="highlight-card">
+            <span class="highlight-card__number">8+</span>
+            <span class="highlight-card__label">Programming Languages</span>
+          </div>
+          <div class="highlight-card">
+            <span class="highlight-card__number">3+</span>
+            <span class="highlight-card__label">Design Tools</span>
+          </div>
+          <div class="highlight-card">
+            <span class="highlight-card__number">3</span>
+            <span class="highlight-card__label">BPO Industry Domains</span>
+          </div>
+          <div class="highlight-card">
+            <span class="highlight-card__number">BSIT</span>
+            <span class="highlight-card__label">Degree at CTU</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section class="section skills" id="skills">
+    <div class="container">
+      <div class="section__header">
+        <span class="section__label">What I Know</span>
+        <h2 class="section__title">Skills &amp; Tools</h2>
+      </div>
+      <div class="skills__groups">
+
+        <div class="skill-group">
+          <h3 class="skill-group__title">Development</h3>
+          <div class="skill-tags">
+            <span class="skill-tag skill-tag--dev">C#</span>
+            <span class="skill-tag skill-tag--dev">C</span>
+            <span class="skill-tag skill-tag--dev">Java</span>
+            <span class="skill-tag skill-tag--dev">HTML</span>
+            <span class="skill-tag skill-tag--dev">CSS</span>
+            <span class="skill-tag skill-tag--dev">JavaScript</span>
+            <span class="skill-tag skill-tag--dev">Python</span>
+            <span class="skill-tag skill-tag--dev">SQL</span>
+            <span class="skill-tag skill-tag--dev">Full Stack Dev</span>
+          </div>
+        </div>
+
+        <div class="skill-group">
+          <h3 class="skill-group__title">Design</h3>
+          <div class="skill-tags">
+            <span class="skill-tag skill-tag--design">Adobe Photoshop</span>
+            <span class="skill-tag skill-tag--design">Adobe Illustrator</span>
+            <span class="skill-tag skill-tag--design">Adobe After Effects</span>
+            <span class="skill-tag skill-tag--design">UI Design</span>
+          </div>
+        </div>
+
+        <div class="skill-group">
+          <h3 class="skill-group__title">Systems &amp; Soft Skills</h3>
+          <div class="skill-tags">
+            <span class="skill-tag skill-tag--other">Hardware &amp; Circuits</span>
+            <span class="skill-tag skill-tag--other">System Engineering</span>
+            <span class="skill-tag skill-tag--other">BPO / Customer Service</span>
+            <span class="skill-tag skill-tag--other">Telecommunications</span>
+            <span class="skill-tag skill-tag--other">Healthcare Support</span>
+            <span class="skill-tag skill-tag--other">E-Commerce</span>
+            <span class="skill-tag skill-tag--other">Persuasive Communication</span>
+            <span class="skill-tag skill-tag--other">MS Office Suite</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section class="section experience" id="experience">
+    <div class="container">
+      <div class="section__header">
+        <span class="section__label">Where I've Worked</span>
+        <h2 class="section__title">Work Experience</h2>
+      </div>
+      <div class="timeline">
+
+        <div class="timeline__item">
+          <div class="timeline__dot"></div>
+          <div class="timeline__content">
+            <span class="timeline__tag">Telecommunications</span>
+            <h3 class="timeline__role">Customer Service Representative</h3>
+            <p class="timeline__company">Qualfon Inc.</p>
+            <p class="timeline__duration">1 year &amp; 4 months</p>
+            <p class="timeline__desc">
+              Delivered frontline customer support for a telecommunications account,
+              resolving technical and billing inquiries while maintaining high satisfaction
+              scores through clear, empathetic communication.
+            </p>
+          </div>
+        </div>
+
+        <div class="timeline__item">
+          <div class="timeline__dot"></div>
+          <div class="timeline__content">
+            <span class="timeline__tag">Healthcare</span>
+            <h3 class="timeline__role">Customer Service Representative</h3>
+            <p class="timeline__company">Concentrix — Cebu Exchange IT Park</p>
+            <p class="timeline__desc">
+              Supported healthcare clients and patients in navigating services and
+              resolving account concerns, developing strong domain knowledge in
+              healthcare processes and compliance requirements.
+            </p>
+          </div>
+        </div>
+
+        <div class="timeline__item">
+          <div class="timeline__dot"></div>
+          <div class="timeline__content">
+            <span class="timeline__tag">E-Commerce</span>
+            <h3 class="timeline__role">Customer Service Representative</h3>
+            <p class="timeline__company">Dialed In PH</p>
+            <p class="timeline__desc">
+              Handled multi-platform e-commerce support across Cartpanda, Buygoods,
+              DigiStore, and Shopify — processing orders, resolving disputes, and
+              supporting digital product transactions in fast-paced retail environments.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section class="section education" id="education">
+    <div class="container">
+      <div class="section__header">
+        <span class="section__label">Where I Learned</span>
+        <h2 class="section__title">Education</h2>
+      </div>
+      <div class="edu-grid">
+
+        <div class="edu-card">
+          <div class="edu-card__level">Primary</div>
+          <div class="edu-card__body">
+            <h3 class="edu-card__school">Mohon Elementary School</h3>
+          </div>
+        </div>
+
+        <div class="edu-card">
+          <div class="edu-card__level">Junior High</div>
+          <div class="edu-card__body">
+            <h3 class="edu-card__school">Mohon National High School</h3>
+          </div>
+        </div>
+
+        <div class="edu-card">
+          <div class="edu-card__level">Senior High</div>
+          <div class="edu-card__body">
+            <h3 class="edu-card__school">Academia System Global Colleges</h3>
+            <p class="edu-card__detail">TVL — ICT Strand</p>
+          </div>
+        </div>
+
+        <div class="edu-card edu-card--accent">
+          <div class="edu-card__level">Extension Training</div>
+          <div class="edu-card__body">
+            <h3 class="edu-card__school">SouthWestern University PHINMA, Cebu</h3>
+            <p class="edu-card__detail">Modular Training — Microsoft Office Applications<br />(Word, Excel, PowerPoint)</p>
+          </div>
+        </div>
+
+        <div class="edu-card edu-card--primary">
+          <div class="edu-card__level">College</div>
+          <div class="edu-card__body">
+            <h3 class="edu-card__school">Cebu Technological University</h3>
+            <p class="edu-card__detail">Bachelor of Science in Information Technology (BSIT)</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section contact" id="contact">
+    <div class="container">
+      <div class="section__header">
+        <span class="section__label">Let's Connect</span>
+        <h2 class="section__title">Get in Touch</h2>
+      </div>
+      <div class="contact__body">
+        <p class="contact__intro">
+          Whether you have a project in mind, a role to fill, or just want to say hello —
+          my inbox is always open.
+        </p>
+        <div class="contact__cards">
+          <a href="mailto:dalminohanz14@gmail.com" class="contact-card">
+            <div class="contact-card__icon">✉</div>
+            <div class="contact-card__info">
+              <span class="contact-card__label">Email</span>
+              <span class="contact-card__value">dalminohanz14@gmail.com</span>
+            </div>
+          </a>
+          <div class="contact-card">
+            <div class="contact-card__icon">📍</div>
+            <div class="contact-card__info">
+              <span class="contact-card__label">Location</span>
+              <span class="contact-card__value">Talisay City, Cebu, Philippines</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>&copy; 2025 Hanz Dee Dalmino. Built with care and clean code.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
