@@ -50,14 +50,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ---------- GREETING BUTTON ---------- */
 const greetings = [
-  '"Code is poetry. Let's write something beautiful together."',
+  '"Code is poetry. Let\'s write something beautiful together."',
   '"Hello! I turn coffee and curiosity into working software."',
   '"Mabuhay! Ready to build something great?"',
   '"From Cebu with clean code and creative design."',
-  '"Full stack, fully committed — let's talk!"',
+  '"Full stack, fully committed — let\'s talk!"',
   '"Great design is invisible. Great code is the same."',
   '"Hardware or software — I speak both languages."',
-  '"Let's collaborate and ship something worth showing off."'
+  '"Let\'s collaborate and ship something worth showing off."'
 ];
 
 const greetBtn     = document.getElementById('greetBtn');
