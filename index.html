@@ -3,274 +3,292 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hanz Dee Dalmino — Web Developer & System Engineer</title>
+  <title>HDDev — Hanz Dee Dalmino</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
 
-  <!-- NAV -->
+  <!-- ===== NAV ===== -->
   <nav class="nav" id="nav">
-    <div class="nav__logo">HDD</div>
-    <button class="nav__hamburger" id="hamburger" aria-label="Toggle menu">
-      <span></span><span></span><span></span>
-    </button>
-    <ul class="nav__links" id="navLinks">
-      <li><a href="#about" class="nav__link">About</a></li>
-      <li><a href="#skills" class="nav__link">Skills</a></li>
-      <li><a href="#experience" class="nav__link">Experience</a></li>
-      <li><a href="#education" class="nav__link">Education</a></li>
-      <li><a href="#contact" class="nav__link">Contact</a></li>
-    </ul>
+    <a class="nav__logo" href="#" data-page="0" aria-label="Go to cover">
+      <span class="logo-hd">HD</span><span class="logo-dev">Dev</span>
+    </a>
+
+    <div class="nav__center" id="navChapterTitle"></div>
+
+    <div class="nav__right">
+      <div class="nav__page-indicator" id="pageIndicator">
+        <span id="currentPage">1</span> / <span id="totalPages">6</span>
+      </div>
+      <button class="nav__hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </nav>
 
-  <!-- HERO -->
-  <section class="hero" id="hero">
-    <div class="hero__bg-shape"></div>
-    <div class="hero__content">
-      <p class="hero__eyebrow">Based in Talisay City, Cebu, Philippines</p>
-      <h1 class="hero__name">Hanz Dee<br /><em>Dalmino</em></h1>
-      <div class="hero__role">
-        <span class="hero__role-prefix">I build as a&nbsp;</span>
-        <span class="hero__role-typed" id="typedRole"></span>
-        <span class="hero__role-cursor">|</span>
-      </div>
-      <p class="hero__tagline">
-        Full-stack developer &amp; UI designer who bridges clean code<br class="br-desktop" />
-        with creative systems — from pixels to circuits.
-      </p>
-      <div class="hero__actions">
-        <button class="btn btn--primary" id="greetBtn">Say Hello</button>
-        <a href="#contact" class="btn btn--outline">Get in Touch</a>
-      </div>
-      <div class="hero__greeting-box" id="greetingBox" aria-live="polite"></div>
+  <!-- ===== MOBILE DRAWER ===== -->
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer__inner">
+      <button class="drawer__close" id="drawerClose" aria-label="Close menu">&#x2715;</button>
+      <nav class="drawer__nav">
+        <a class="drawer__link" data-page="0">Cover</a>
+        <a class="drawer__link" data-page="1">About</a>
+        <a class="drawer__link" data-page="2">Skills</a>
+        <a class="drawer__link" data-page="3">Experience</a>
+        <a class="drawer__link" data-page="4">Education</a>
+        <a class="drawer__link" data-page="5">Contact</a>
+      </nav>
     </div>
-    <div class="hero__deco">
-      <div class="hero__deco-ring hero__deco-ring--1"></div>
-      <div class="hero__deco-ring hero__deco-ring--2"></div>
-      <div class="hero__deco-ring hero__deco-ring--3"></div>
-    </div>
-  </section>
+  </div>
+  <div class="drawer__overlay" id="drawerOverlay"></div>
 
-  <!-- ABOUT -->
-  <section class="section about" id="about">
-    <div class="container">
-      <div class="section__header">
-        <span class="section__label">Who I Am</span>
-        <h2 class="section__title">About Me</h2>
-      </div>
-      <div class="about__body">
-        <div class="about__text">
-          <p>
-            I'm a <strong>Web Developer and System Engineer</strong> with a passion for
-            crafting digital experiences that are as functional as they are beautiful.
-            My background spans frontend and backend development, UI/UX design,
-            hardware systems, and customer service — giving me an unusually broad
-            perspective on how technology serves real people.
+  <!-- ===== BOOK WRAPPER ===== -->
+  <main class="book" id="book">
+
+    <!-- PAGE 0 — COVER -->
+    <section class="page page--cover" id="page-0" data-chapter="Cover">
+      <div class="page__inner">
+        <div class="cover__bg-shape"></div>
+        <div class="cover__content">
+          <p class="cover__eyebrow">Based in Talisay City, Cebu, Philippines</p>
+          <h1 class="cover__name">Hanz Dee<br /><em>Dalmino</em></h1>
+          <div class="cover__role">
+            <span class="cover__role-prefix">I build as a&nbsp;</span>
+            <span class="cover__role-typed" id="typedRole"></span>
+            <span class="cover__role-cursor">|</span>
+          </div>
+          <p class="cover__tagline">
+            Full-stack developer &amp; UI designer who bridges clean code
+            with creative systems — from pixels to circuits.
           </p>
-          <p>
-            Educated at <strong>Cebu Technological University</strong> in Bachelor of
-            Science in Information Technology, I continuously sharpen my skills across
-            the full product lifecycle — from writing code to designing interfaces to
-            understanding the hardware beneath it all.
-          </p>
-          <p>
-            Outside of coding, I work with design tools like Adobe Photoshop,
-            Illustrator, and After Effects, blending the technical and creative in
-            everything I build.
-          </p>
+          <div class="cover__actions">
+            <button class="btn btn--primary" id="greetBtn">Say Hello</button>
+            <button class="btn btn--outline" data-page="5">Get in Touch</button>
+          </div>
+          <div class="cover__greeting-box" id="greetingBox" aria-live="polite"></div>
         </div>
-        <div class="about__highlights">
-          <div class="highlight-card">
-            <span class="highlight-card__number">8+</span>
-            <span class="highlight-card__label">Programming Languages</span>
-          </div>
-          <div class="highlight-card">
-            <span class="highlight-card__number">3+</span>
-            <span class="highlight-card__label">Design Tools</span>
-          </div>
-          <div class="highlight-card">
-            <span class="highlight-card__number">3</span>
-            <span class="highlight-card__label">BPO Industry Domains</span>
-          </div>
-          <div class="highlight-card">
-            <span class="highlight-card__number">BSIT</span>
-            <span class="highlight-card__label">Degree at CTU</span>
-          </div>
+        <div class="cover__deco" aria-hidden="true">
+          <div class="deco-ring deco-ring--1"></div>
+          <div class="deco-ring deco-ring--2"></div>
+          <div class="deco-ring deco-ring--3"></div>
+        </div>
+        <div class="cover__scroll-hint" id="scrollHint">
+          <span>Next</span>
+          <div class="scroll-hint__arrow"></div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- SKILLS -->
-  <section class="section skills" id="skills">
-    <div class="container">
-      <div class="section__header">
-        <span class="section__label">What I Know</span>
-        <h2 class="section__title">Skills &amp; Tools</h2>
-      </div>
-      <div class="skills__groups">
-
-        <div class="skill-group">
-          <h3 class="skill-group__title">Development</h3>
-          <div class="skill-tags">
-            <span class="skill-tag skill-tag--dev">C#</span>
-            <span class="skill-tag skill-tag--dev">C</span>
-            <span class="skill-tag skill-tag--dev">Java</span>
-            <span class="skill-tag skill-tag--dev">HTML</span>
-            <span class="skill-tag skill-tag--dev">CSS</span>
-            <span class="skill-tag skill-tag--dev">JavaScript</span>
-            <span class="skill-tag skill-tag--dev">Python</span>
-            <span class="skill-tag skill-tag--dev">SQL</span>
-            <span class="skill-tag skill-tag--dev">Full Stack Dev</span>
-          </div>
+    <!-- PAGE 1 — ABOUT -->
+    <section class="page page--light" id="page-1" data-chapter="About Me">
+      <div class="page__inner">
+        <div class="chapter__header">
+          <span class="chapter__label">Who I Am</span>
+          <h2 class="chapter__title">About Me</h2>
+          <div class="chapter__rule"></div>
         </div>
-
-        <div class="skill-group">
-          <h3 class="skill-group__title">Design</h3>
-          <div class="skill-tags">
-            <span class="skill-tag skill-tag--design">Adobe Photoshop</span>
-            <span class="skill-tag skill-tag--design">Adobe Illustrator</span>
-            <span class="skill-tag skill-tag--design">Adobe After Effects</span>
-            <span class="skill-tag skill-tag--design">UI Design</span>
-          </div>
-        </div>
-
-        <div class="skill-group">
-          <h3 class="skill-group__title">Systems &amp; Soft Skills</h3>
-          <div class="skill-tags">
-            <span class="skill-tag skill-tag--other">Hardware &amp; Circuits</span>
-            <span class="skill-tag skill-tag--other">System Engineering</span>
-            <span class="skill-tag skill-tag--other">BPO / Customer Service</span>
-            <span class="skill-tag skill-tag--other">Telecommunications</span>
-            <span class="skill-tag skill-tag--other">Healthcare Support</span>
-            <span class="skill-tag skill-tag--other">E-Commerce</span>
-            <span class="skill-tag skill-tag--other">Persuasive Communication</span>
-            <span class="skill-tag skill-tag--other">MS Office Suite</span>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- EXPERIENCE -->
-  <section class="section experience" id="experience">
-    <div class="container">
-      <div class="section__header">
-        <span class="section__label">Where I've Worked</span>
-        <h2 class="section__title">Work Experience</h2>
-      </div>
-      <div class="timeline">
-
-        <div class="timeline__item">
-          <div class="timeline__dot"></div>
-          <div class="timeline__content">
-            <span class="timeline__tag">Telecommunications</span>
-            <h3 class="timeline__role">Customer Service Representative</h3>
-            <p class="timeline__company">Qualfon Inc.</p>
-            <p class="timeline__duration">1 year &amp; 4 months</p>
-            <p class="timeline__desc">
-              Delivered frontline customer support for a telecommunications account,
-              resolving technical and billing inquiries while maintaining high satisfaction
-              scores through clear, empathetic communication.
+        <div class="about__body">
+          <div class="about__text">
+            <p>
+              I'm a <strong>Web Developer and System Engineer</strong> with a passion for
+              crafting digital experiences that are as functional as they are beautiful.
+              My background spans frontend and backend development, UI/UX design,
+              hardware systems, and customer service — giving me an unusually broad
+              perspective on how technology serves real people.
+            </p>
+            <p>
+              Educated at <strong>Cebu Technological University</strong> in Bachelor of
+              Science in Information Technology, I continuously sharpen my skills across
+              the full product lifecycle — from writing code to designing interfaces to
+              understanding the hardware beneath it all.
+            </p>
+            <p>
+              Outside of coding, I work with design tools like Adobe Photoshop,
+              Illustrator, and After Effects, blending the technical and creative in
+              everything I build.
             </p>
           </div>
-        </div>
-
-        <div class="timeline__item">
-          <div class="timeline__dot"></div>
-          <div class="timeline__content">
-            <span class="timeline__tag">Healthcare</span>
-            <h3 class="timeline__role">Customer Service Representative</h3>
-            <p class="timeline__company">Concentrix — Cebu Exchange IT Park</p>
-            <p class="timeline__desc">
-              Supported healthcare clients and patients in navigating services and
-              resolving account concerns, developing strong domain knowledge in
-              healthcare processes and compliance requirements.
-            </p>
+          <div class="about__stats">
+            <div class="stat-card">
+              <span class="stat-card__num">8+</span>
+              <span class="stat-card__label">Programming Languages</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card__num">3+</span>
+              <span class="stat-card__label">Design Tools</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card__num">3</span>
+              <span class="stat-card__label">BPO Domains</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card__num">BSIT</span>
+              <span class="stat-card__label">Degree at CTU</span>
+            </div>
           </div>
         </div>
-
-        <div class="timeline__item">
-          <div class="timeline__dot"></div>
-          <div class="timeline__content">
-            <span class="timeline__tag">E-Commerce</span>
-            <h3 class="timeline__role">Customer Service Representative</h3>
-            <p class="timeline__company">Dialed In PH</p>
-            <p class="timeline__desc">
-              Handled multi-platform e-commerce support across Cartpanda, Buygoods,
-              DigiStore, and Shopify — processing orders, resolving disputes, and
-              supporting digital product transactions in fast-paced retail environments.
-            </p>
-          </div>
-        </div>
-
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- EDUCATION -->
-  <section class="section education" id="education">
-    <div class="container">
-      <div class="section__header">
-        <span class="section__label">Where I Learned</span>
-        <h2 class="section__title">Education</h2>
+    <!-- PAGE 2 — SKILLS -->
+    <section class="page page--dark" id="page-2" data-chapter="Skills &amp; Tools">
+      <div class="page__inner">
+        <div class="chapter__header chapter__header--light">
+          <span class="chapter__label">What I Know</span>
+          <h2 class="chapter__title">Skills &amp; Tools</h2>
+          <div class="chapter__rule chapter__rule--light"></div>
+        </div>
+        <div class="skills__groups">
+          <div class="skill-group">
+            <h3 class="skill-group__title">Development</h3>
+            <div class="skill-tags">
+              <span class="skill-tag skill-tag--dev">C#</span>
+              <span class="skill-tag skill-tag--dev">C</span>
+              <span class="skill-tag skill-tag--dev">Java</span>
+              <span class="skill-tag skill-tag--dev">HTML</span>
+              <span class="skill-tag skill-tag--dev">CSS</span>
+              <span class="skill-tag skill-tag--dev">JavaScript</span>
+              <span class="skill-tag skill-tag--dev">Python</span>
+              <span class="skill-tag skill-tag--dev">SQL</span>
+              <span class="skill-tag skill-tag--dev">Full Stack Dev</span>
+            </div>
+          </div>
+          <div class="skill-group">
+            <h3 class="skill-group__title">Design</h3>
+            <div class="skill-tags">
+              <span class="skill-tag skill-tag--design">Adobe Photoshop</span>
+              <span class="skill-tag skill-tag--design">Adobe Illustrator</span>
+              <span class="skill-tag skill-tag--design">Adobe After Effects</span>
+              <span class="skill-tag skill-tag--design">UI Design</span>
+            </div>
+          </div>
+          <div class="skill-group">
+            <h3 class="skill-group__title">Systems &amp; Soft Skills</h3>
+            <div class="skill-tags">
+              <span class="skill-tag skill-tag--other">Hardware &amp; Circuits</span>
+              <span class="skill-tag skill-tag--other">System Engineering</span>
+              <span class="skill-tag skill-tag--other">BPO / Customer Service</span>
+              <span class="skill-tag skill-tag--other">Telecommunications</span>
+              <span class="skill-tag skill-tag--other">Healthcare Support</span>
+              <span class="skill-tag skill-tag--other">E-Commerce</span>
+              <span class="skill-tag skill-tag--other">Persuasive Communication</span>
+              <span class="skill-tag skill-tag--other">MS Office Suite</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="edu-grid">
+    </section>
 
-        <div class="edu-card">
-          <div class="edu-card__level">Primary</div>
-          <div class="edu-card__body">
-            <h3 class="edu-card__school">Mohon Elementary School</h3>
+    <!-- PAGE 3 — EXPERIENCE -->
+    <section class="page page--light" id="page-3" data-chapter="Work Experience">
+      <div class="page__inner">
+        <div class="chapter__header">
+          <span class="chapter__label">Where I've Worked</span>
+          <h2 class="chapter__title">Work Experience</h2>
+          <div class="chapter__rule"></div>
+        </div>
+        <div class="timeline">
+          <div class="timeline__item">
+            <div class="timeline__dot"></div>
+            <div class="timeline__content">
+              <span class="timeline__tag">Telecommunications</span>
+              <h3 class="timeline__role">Customer Service Representative</h3>
+              <p class="timeline__company">Qualfon Inc.</p>
+              <p class="timeline__duration">1 year &amp; 4 months</p>
+              <p class="timeline__desc">
+                Delivered frontline customer support for a telecommunications account,
+                resolving technical and billing inquiries while maintaining high satisfaction
+                scores through clear, empathetic communication.
+              </p>
+            </div>
+          </div>
+          <div class="timeline__item">
+            <div class="timeline__dot"></div>
+            <div class="timeline__content">
+              <span class="timeline__tag">Healthcare</span>
+              <h3 class="timeline__role">Customer Service Representative</h3>
+              <p class="timeline__company">Concentrix — Cebu Exchange IT Park</p>
+              <p class="timeline__desc">
+                Supported healthcare clients and patients in navigating services and
+                resolving account concerns, developing strong domain knowledge in
+                healthcare processes and compliance requirements.
+              </p>
+            </div>
+          </div>
+          <div class="timeline__item">
+            <div class="timeline__dot"></div>
+            <div class="timeline__content">
+              <span class="timeline__tag">E-Commerce</span>
+              <h3 class="timeline__role">Customer Service Representative</h3>
+              <p class="timeline__company">Dialed In PH</p>
+              <p class="timeline__desc">
+                Handled multi-platform e-commerce support across Cartpanda, Buygoods,
+                DigiStore, and Shopify — processing orders, resolving disputes, and
+                supporting digital product transactions in fast-paced retail environments.
+              </p>
+            </div>
           </div>
         </div>
-
-        <div class="edu-card">
-          <div class="edu-card__level">Junior High</div>
-          <div class="edu-card__body">
-            <h3 class="edu-card__school">Mohon National High School</h3>
-          </div>
-        </div>
-
-        <div class="edu-card">
-          <div class="edu-card__level">Senior High</div>
-          <div class="edu-card__body">
-            <h3 class="edu-card__school">Academia System Global Colleges</h3>
-            <p class="edu-card__detail">TVL — ICT Strand</p>
-          </div>
-        </div>
-
-        <div class="edu-card edu-card--accent">
-          <div class="edu-card__level">Extension Program</div>
-          <div class="edu-card__body">
-            <h3 class="edu-card__school">SouthWestern University PHINMA, Cebu</h3>
-            <p class="edu-card__detail">Modular Training — Microsoft Office Applications<br />(Word, Excel, PowerPoint)</p>
-          </div>
-        </div>
-
-        <div class="edu-card edu-card--primary">
-          <div class="edu-card__level">College</div>
-          <div class="edu-card__body">
-            <h3 class="edu-card__school">Cebu Technological University</h3>
-            <p class="edu-card__detail">Bachelor of Science in Information Technology (BSIT)</p>
-          </div>
-        </div>
-
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- CONTACT -->
-  <section class="section contact" id="contact">
-    <div class="container">
-      <div class="section__header">
-        <span class="section__label">Let's Connect</span>
-        <h2 class="section__title">Get in Touch</h2>
+    <!-- PAGE 4 — EDUCATION -->
+    <section class="page page--cream" id="page-4" data-chapter="Education">
+      <div class="page__inner">
+        <div class="chapter__header">
+          <span class="chapter__label">Where I Learned</span>
+          <h2 class="chapter__title">Education</h2>
+          <div class="chapter__rule"></div>
+        </div>
+        <div class="edu-grid">
+          <div class="edu-card">
+            <div class="edu-card__level">Primary</div>
+            <div class="edu-card__body">
+              <h3 class="edu-card__school">Mohon Elementary School</h3>
+            </div>
+          </div>
+          <div class="edu-card">
+            <div class="edu-card__level">Junior High</div>
+            <div class="edu-card__body">
+              <h3 class="edu-card__school">Mohon National High School</h3>
+            </div>
+          </div>
+          <div class="edu-card">
+            <div class="edu-card__level">Senior High</div>
+            <div class="edu-card__body">
+              <h3 class="edu-card__school">Academia System Global Colleges</h3>
+              <p class="edu-card__detail">TVL — ICT Strand</p>
+            </div>
+          </div>
+          <div class="edu-card edu-card--teal">
+            <div class="edu-card__level">Extension Program</div>
+            <div class="edu-card__body">
+              <h3 class="edu-card__school">SouthWestern University PHINMA, Cebu</h3>
+              <p class="edu-card__detail">Modular Training — Microsoft Office Applications (Word, Excel, PowerPoint)</p>
+            </div>
+          </div>
+          <div class="edu-card edu-card--coral">
+            <div class="edu-card__level">College</div>
+            <div class="edu-card__body">
+              <h3 class="edu-card__school">Cebu Technological University</h3>
+              <p class="edu-card__detail">Bachelor of Science in Information Technology (BSIT)</p>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="contact__body">
+    </section>
+
+    <!-- PAGE 5 — CONTACT -->
+    <section class="page page--dark" id="page-5" data-chapter="Get in Touch">
+      <div class="page__inner">
+        <div class="chapter__header chapter__header--light">
+          <span class="chapter__label">Let's Connect</span>
+          <h2 class="chapter__title">Get in Touch</h2>
+          <div class="chapter__rule chapter__rule--light"></div>
+        </div>
         <p class="contact__intro">
           Whether you have a project in mind, a role to fill, or just want to say hello —
           my inbox is always open.
@@ -285,6 +303,15 @@
               <span class="contact-card__value">dalminohanz14@gmail.com</span>
             </div>
           </a>
+          <a href="tel:+639XXXXXXXXX" class="contact-card">
+            <div class="contact-card__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.35 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.72 16z"/></svg>
+            </div>
+            <div class="contact-card__info">
+              <span class="contact-card__label">Phone</span>
+              <span class="contact-card__value">+63 9XX XXX XXXX</span>
+            </div>
+          </a>
           <div class="contact-card">
             <div class="contact-card__icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -295,14 +322,24 @@
             </div>
           </div>
         </div>
+        <footer class="page__footer">
+          <p>&copy; 2025 Hanz Dee Dalmino. Built with care and clean code.</p>
+        </footer>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <p>&copy; 2025 Hanz Dee Dalmino. Built with care and clean code.</p>
-  </footer>
+  </main>
+
+  <!-- ===== PAGE NAV ARROWS ===== -->
+  <button class="page-nav page-nav--prev" id="prevBtn" aria-label="Previous page">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <button class="page-nav page-nav--next" id="nextBtn" aria-label="Next page">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
+
+  <!-- ===== DOT PAGINATION ===== -->
+  <div class="dot-nav" id="dotNav" aria-label="Page navigation"></div>
 
   <script src="script.js"></script>
 </body>
