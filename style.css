@@ -23,7 +23,7 @@
   --shadow-sm: 0 2px 12px rgba(26,43,74,0.10);
   --shadow-md: 0 8px 32px rgba(26,43,74,0.16);
 
-  --nav-h: 64px;
+  --nav-h: 72px;  /* Increased slightly to accommodate bigger logo */
   --ease: cubic-bezier(0.76, 0, 0.24, 1);
   --page-duration: 0.65s;
 }
@@ -60,14 +60,14 @@ ul { list-style: none; }
   border-bottom: 1px solid rgba(255,255,255,0.07);
 }
 
-/* ---- HDDev Wordmark ---- */
+/* ---- HDDev Wordmark (INCREASED SIZE) ---- */
 .nav__logo {
   display: inline-flex;
   align-items: baseline;
   gap: 0;
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 1.45rem;
+  font-size: 1.9rem;  /* Increased from 1.45rem */
   line-height: 1;
   letter-spacing: -0.01em;
   cursor: pointer;
@@ -93,7 +93,7 @@ ul { list-style: none; }
 .logo-dev {
   color: var(--coral);
   font-style: italic;
-  font-size: 1.05rem;
+  font-size: 1.3rem;  /* Increased proportionally */
   font-weight: 700;
   letter-spacing: 0.02em;
   margin-left: 1px;
@@ -233,7 +233,6 @@ ul { list-style: none; }
     transform var(--page-duration) var(--ease),
     opacity var(--page-duration) var(--ease);
   will-change: transform, opacity;
-  /* Preserve 3D for the "lift" feel */
   backface-visibility: hidden;
 }
 
@@ -275,6 +274,28 @@ ul { list-style: none; }
   max-width: 1100px;
   margin: 0 auto;
   padding: 3.5rem 2rem 6rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- Footer inside page ---- */
+.page__footer {
+  margin-top: auto;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255,255,255,0.09);
+  font-size: 0.80rem;
+  color: rgba(255,255,255,0.28);
+  letter-spacing: 0.04em;
+  text-align: center;
+  display: block;  /* ensure visible */
+}
+.page--light .page__footer {
+  border-top-color: rgba(0,0,0,0.08);
+  color: rgba(0,0,0,0.30);
+}
+.page--cream .page__footer {
+  border-top-color: rgba(0,0,0,0.08);
+  color: rgba(0,0,0,0.30);
 }
 
 /* =============================================
@@ -415,6 +436,40 @@ ul { list-style: none; }
   transform: translateY(-2px);
 }
 
+/* ---- Next Page Button (bottom center) ---- */
+.next-page-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin: 2rem auto 0;
+  padding: 0.8rem 2.2rem;
+  border-radius: var(--radius-lg);
+  background: var(--teal);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.25s, transform 0.25s, box-shadow 0.25s;
+  box-shadow: 0 4px 16px rgba(0,180,216,0.25);
+}
+.next-page-btn:hover {
+  background: #009bc2;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(0,180,216,0.40);
+}
+.next-page-btn:active { transform: scale(0.97); }
+.next-page-btn i {
+  font-size: 1.1rem;
+  transition: transform 0.3s;
+}
+.next-page-btn:hover i { transform: translateX(4px); }
+
+/* Hide on last page (handled by JS) */
+.next-page-btn.hidden { display: none; }
+
 /* =============================================
    CHAPTER HEADER
    ============================================= */
@@ -519,7 +574,7 @@ ul { list-style: none; }
   font-weight: 500;
   border: 1.5px solid transparent;
   transition: transform 0.2s, box-shadow 0.2s, background 0.2s, color 0.2s;
-  cursor: default;
+  cursor: pointer;
 }
 .skill-tag:hover { transform: translateY(-3px); }
 
@@ -531,6 +586,66 @@ ul { list-style: none; }
 
 .skill-tag--other { background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.70);border-color:rgba(255,255,255,0.13); }
 .skill-tag--other:hover { background:rgba(255,255,255,0.18);color:var(--white); }
+
+/* =============================================
+   SKILL MODAL (POPUP)
+   ============================================= */
+.skill-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.skill-modal__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(6px);
+}
+.skill-modal__box {
+  position: relative;
+  max-width: 560px;
+  width: 90%;
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 2.2rem 2.2rem 2rem;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+  animation: modalPop 0.3s var(--ease);
+  z-index: 1;
+}
+@keyframes modalPop {
+  0% { opacity: 0; transform: scale(0.92) translateY(20px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.skill-modal__close {
+  position: absolute;
+  top: 0.8rem; right: 1.2rem;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--grey-md);
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+}
+.skill-modal__close:hover { color: var(--coral); transform: rotate(90deg); }
+.skill-modal__title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 0.8rem;
+  padding-right: 2rem;
+}
+.skill-modal__desc {
+  font-size: 1rem;
+  color: var(--charcoal);
+  line-height: 1.8;
+  margin-bottom: 0.5rem;
+}
 
 /* =============================================
    TIMELINE
@@ -677,46 +792,11 @@ ul { list-style: none; }
 .contact-card__value { font-size:0.93rem;color:rgba(255,255,255,0.85);font-weight:500; }
 
 /* =============================================
-   PAGE FOOTER (inside contact page)
-   ============================================= */
-.page__footer {
-  margin-top:3.5rem;
-  padding-top:1.5rem;
-  border-top:1px solid rgba(255,255,255,0.09);
-  font-size:0.80rem;
-  color:rgba(255,255,255,0.28);
-  letter-spacing:0.04em;
-  text-align:center;
-}
-
-/* =============================================
-   PAGE NAV ARROWS
-   ============================================= */
-.page-nav {
-  position:fixed;
-  z-index:400;
-  width:44px;height:44px;
-  border-radius:50%;
-  border:1.5px solid rgba(255,255,255,0.20);
-  background:rgba(26,43,74,0.70);
-  backdrop-filter:blur(8px);
-  color:var(--white);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;
-  transition:background 0.22s, border-color 0.22s, transform 0.22s, opacity 0.22s;
-}
-.page-nav:hover { background:var(--coral);border-color:var(--coral);transform:scale(1.10); }
-.page-nav:disabled { opacity:0.2;pointer-events:none; }
-
-.page-nav--prev { bottom:2.2rem;left:1.8rem; }
-.page-nav--next { bottom:2.2rem;right:1.8rem; }
-
-/* =============================================
    DOT PAGINATION
    ============================================= */
 .dot-nav {
   position:fixed;
-  bottom:2.4rem;
+  bottom: 2.4rem;
   left:50%;transform:translateX(-50%);
   z-index:400;
   display:flex;gap:8px;align-items:center;
@@ -752,7 +832,10 @@ ul { list-style: none; }
 }
 
 @media (max-width: 640px) {
-  :root { --nav-h: 58px; }
+  :root { --nav-h: 64px; }
+
+  .nav__logo { font-size: 1.6rem; }
+  .logo-dev { font-size: 1.1rem; }
 
   .nav__center { display:none; }
 
@@ -774,8 +857,10 @@ ul { list-style: none; }
   .contact__cards { flex-direction:column; }
   .contact-card { width:100%; }
 
-  .page-nav--prev { left:1rem; }
-  .page-nav--next { right:1rem; }
+  .next-page-btn { width:100%; justify-content:center; }
+
+  .skill-modal__box { padding: 1.8rem; }
+  .skill-modal__title { font-size:1.3rem; }
 }
 
 /* =============================================
