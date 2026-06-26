@@ -220,7 +220,7 @@ setTimeout(() => {
 
 
 /* =============================================
-   SKILL POPUP / MODAL SYSTEM
+   SKILL POPUP / MODAL SYSTEM (FIXED)
    ============================================= */
 
 /* ---- Skill descriptions ---- */
@@ -332,29 +332,31 @@ function showSkillPopup(skillName) {
   document.body.style.overflow = 'hidden';
 }
 
-/* ---- Attach click events to skill tags ---- */
-document.addEventListener('DOMContentLoaded', function() {
-  const skillTags = document.querySelectorAll('.skill-tag');
-  skillTags.forEach(tag => {
-    tag.style.cursor = 'pointer';
-    tag.addEventListener('click', function(e) {
-      e.stopPropagation();
-      const skillName = this.textContent.trim();
-      showSkillPopup(skillName);
-    });
+/* ---- SKILL CLICK HANDLERS (FIXED) ---- */
+let skillHandlersSetup = false;
+
+function setupSkillClickHandlers() {
+  if (skillHandlersSetup) return;
+  skillHandlersSetup = true;
+
+  // Use a more robust approach: attach event listener directly on parent container (event delegation)
+  // This avoids duplicate listeners and handles dynamically added tags automatically.
+  const skillTagContainer = document.querySelector('.skills__groups');
+  if (!skillTagContainer) return;
+
+  skillTagContainer.addEventListener('click', function(e) {
+    const tag = e.target.closest('.skill-tag');
+    if (!tag) return;
+    const skillName = tag.textContent.trim();
+    showSkillPopup(skillName);
   });
+}
+
+/* ---- Initialize skill click handlers on DOM ready ---- */
+document.addEventListener('DOMContentLoaded', function() {
+  setupSkillClickHandlers();
 });
 
-/* ---- Also handle dynamically added skill tags (if any) ---- */
-const skillObserver = new MutationObserver(() => {
-  document.querySelectorAll('.skill-tag:not([data-listener])').forEach(tag => {
-    tag.setAttribute('data-listener', 'true');
-    tag.style.cursor = 'pointer';
-    tag.addEventListener('click', function(e) {
-      e.stopPropagation();
-      const skillName = this.textContent.trim();
-      showSkillPopup(skillName);
-    });
-  });
-});
-skillObserver.observe(document.body, { childList: true, subtree: true });
+/* ---- Also handle if skills are added later (though unlikely) ---- */
+// We don't need a MutationObserver now because event delegation covers it.
+// The observer is removed to prevent duplicate event listeners.
