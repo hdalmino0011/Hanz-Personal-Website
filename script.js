@@ -1,186 +1,111 @@
-/* =============================================
-   HANZ DEE DALMINO — PORTFOLIO SCRIPTS
-   Enhanced edition
-   ============================================= */
+/* =================================================================
+   HD DEV DISPATCH — SCRIPTS
+   Single-scroll editorial layout
+   ================================================================= */
 
-/* =============================================
-   PAGE FLIP ENGINE
-   ============================================= */
-const pages      = Array.from(document.querySelectorAll('.page'));
-const totalPages = pages.length;
-let currentIndex = 0;
-let isAnimating  = false;
+/* =================================================================
+   NAV PROGRESS BAR + SCROLLED STATE
+   ================================================================= */
+const navProgress = document.getElementById('navProgress');
+const mastheadNav  = document.getElementById('mastheadNav');
+const backToTop    = document.getElementById('backToTop');
 
-const currentPageEl  = document.getElementById('currentPage');
-const totalPagesEl   = document.getElementById('totalPages');
-const chapterTitleEl = document.getElementById('navChapterTitle');
+function onScroll() {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
 
-if (totalPagesEl) totalPagesEl.textContent = totalPages;
-
-/* ---- Build dot nav ---- */
-const dotNavEl = document.getElementById('dotNav');
-pages.forEach((_, i) => {
-  const dot = document.createElement('button');
-  dot.className = 'dot-nav__dot' + (i === 0 ? ' active' : '');
-  dot.setAttribute('aria-label', 'Go to page ' + (i + 1));
-  dot.addEventListener('click', () => goToPage(i));
-  dotNavEl.appendChild(dot);
-});
-
-function getDots() {
-  return Array.from(dotNavEl.querySelectorAll('.dot-nav__dot'));
+  if (navProgress) navProgress.style.width = pct + '%';
+  if (mastheadNav) mastheadNav.classList.toggle('scrolled', scrollTop > 10);
+  if (backToTop) backToTop.classList.toggle('visible', scrollTop > 600);
 }
+window.addEventListener('scroll', onScroll, { passive: true });
+onScroll();
 
-function updateUI(index) {
-  if (currentPageEl) currentPageEl.textContent = index + 1;
+/* =================================================================
+   SCROLL REVEAL — fade/rise sections into view
+   ================================================================= */
+const revealTargets = document.querySelectorAll(
+  '.dept-head, .article-grid__main, .article-grid__rail, .index-group, ' +
+  '.chronicle__entry, .ledger__row, .classifieds__entry'
+);
+revealTargets.forEach(el => el.classList.add('reveal'));
 
-  const chapterTitle = pages[index].dataset.chapter || '';
-  if (chapterTitleEl) chapterTitleEl.textContent = index > 0 ? chapterTitle : '';
-
-  getDots().forEach((d, i) => d.classList.toggle('active', i === index));
-
-  document.querySelectorAll('.drawer__link').forEach((l, i) => {
-    l.classList.toggle('active', i === index);
-  });
-
-  /* Update all next-page buttons */
-  document.querySelectorAll('[data-next]').forEach(btn => {
-    btn.style.display = (index === totalPages - 1) ? 'none' : 'flex';
-  });
-}
-
-function goToPage(targetIndex) {
-  if (isAnimating || targetIndex === currentIndex) return;
-  if (targetIndex < 0 || targetIndex >= totalPages) return;
-
-  isAnimating = true;
-
-  const goingForward = targetIndex > currentIndex;
-  const current = pages[currentIndex];
-  const target  = pages[targetIndex];
-
-  /* Set target start position */
-  target.classList.remove('is-active', 'is-leaving-up');
-  target.style.transition = 'none';
-  target.style.transform  = goingForward ? 'translateY(100%)' : 'translateY(-100%)';
-  target.style.opacity    = '0';
-
-  target.getBoundingClientRect(); /* force reflow */
-
-  target.style.transition = '';
-  target.style.transform  = '';
-  target.style.opacity    = '';
-  target.classList.add('is-active');
-
-  /* Exit current */
-  current.classList.remove('is-active');
-  current.style.transform = goingForward ? 'translateY(-100%)' : 'translateY(100%)';
-  current.style.opacity   = '0';
-
-  currentIndex = targetIndex;
-  updateUI(currentIndex);
-
-  setTimeout(() => {
-    current.style.transform = '';
-    current.style.opacity   = '';
-    isAnimating = false;
-    /* Reset scroll of entered page */
-    const scrollArea = target.querySelector('.page__scroll-area');
-    if (scrollArea) scrollArea.scrollTop = 0;
-  }, 700);
-}
-
-/* ---- Init: show page 0, hide rest ---- */
-(function initPages() {
-  pages.forEach((p, i) => {
-    p.style.transition = 'none';
-    if (i === 0) {
-      p.classList.add('is-active');
-      p.style.transform = 'translateY(0)';
-      p.style.opacity   = '1';
-    } else {
-      p.style.transform = 'translateY(100%)';
-      p.style.opacity   = '0';
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('is-visible');
+      revealObserver.unobserve(entry.target);
     }
   });
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      pages.forEach(p => { p.style.transition = ''; });
-    });
-  });
-  updateUI(0);
-})();
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 
-/* ---- Next buttons (data-next) ---- */
-document.addEventListener('click', function(e) {
-  if (e.target.closest('[data-next]')) {
-    goToPage(currentIndex + 1);
-  }
+revealTargets.forEach(el => revealObserver.observe(el));
+
+/* Stagger chronicle entries and ledger rows slightly for a nicer cascade */
+document.querySelectorAll('.chronicle__entry').forEach((el, i) => {
+  el.style.transitionDelay = (i * 0.08) + 's';
+});
+document.querySelectorAll('.ledger__row').forEach((el, i) => {
+  el.style.transitionDelay = (i * 0.06) + 's';
+});
+document.querySelectorAll('.classifieds__entry').forEach((el, i) => {
+  el.style.transitionDelay = (i * 0.08) + 's';
 });
 
-/* ---- Data-page links ---- */
-document.querySelectorAll('[data-page]').forEach(el => {
-  el.addEventListener('click', e => {
-    const idx = parseInt(el.dataset.page);
-    if (!isNaN(idx)) {
-      goToPage(idx);
-      closeDrawer();
-    }
-  });
+/* =================================================================
+   MOBILE MENU
+   ================================================================= */
+const menuBtn      = document.getElementById('menuBtn');
+const mobileMenu    = document.getElementById('mobileMenu');
+const mobileOverlay = document.getElementById('mobileOverlay');
+
+function openMenu() {
+  mobileMenu.classList.add('open');
+  mobileOverlay.classList.add('open');
+  mobileMenu.setAttribute('aria-hidden', 'false');
+  menuBtn.setAttribute('aria-expanded', 'true');
+}
+function closeMenu() {
+  mobileMenu.classList.remove('open');
+  mobileOverlay.classList.remove('open');
+  mobileMenu.setAttribute('aria-hidden', 'true');
+  menuBtn.setAttribute('aria-expanded', 'false');
+}
+if (menuBtn) menuBtn.addEventListener('click', () => {
+  mobileMenu.classList.contains('open') ? closeMenu() : openMenu();
+});
+if (mobileOverlay) mobileOverlay.addEventListener('click', closeMenu);
+document.querySelectorAll('.mobile-menu nav a').forEach(link => {
+  link.addEventListener('click', closeMenu);
 });
 
-/* ---- Scroll hint ---- */
-const scrollHint = document.getElementById('scrollHint');
-if (scrollHint) scrollHint.addEventListener('click', () => goToPage(1));
-
-/* ---- Logo ---- */
-const logoEl = document.querySelector('.nav__logo');
-if (logoEl) {
-  logoEl.addEventListener('click', e => {
-    e.preventDefault();
-    goToPage(0);
+/* =================================================================
+   SCROLL CUE (cover -> about)
+   ================================================================= */
+const scrollCue = document.getElementById('scrollCue');
+if (scrollCue) {
+  scrollCue.addEventListener('click', () => {
+    const about = document.getElementById('about');
+    if (about) about.scrollIntoView({ behavior: 'smooth' });
   });
 }
 
-/* ---- Nav shadow on page scroll ---- */
-const navEl = document.getElementById('nav');
-pages.forEach(p => {
-  const scrollArea = p.querySelector('.page__scroll-area');
-  if (scrollArea) {
-    scrollArea.addEventListener('scroll', () => {
-      navEl.classList.toggle('scrolled', scrollArea.scrollTop > 10);
-    }, { passive: true });
-  }
-});
-
-/* =============================================
-   MOBILE DRAWER
-   ============================================= */
-const hamburger     = document.getElementById('hamburger');
-const drawer        = document.getElementById('drawer');
-const drawerOverlay = document.getElementById('drawerOverlay');
-const drawerClose   = document.getElementById('drawerClose');
-
-function openDrawer() {
-  drawer.classList.add('open');
-  drawerOverlay.classList.add('open');
-  drawer.setAttribute('aria-hidden', 'false');
-  hamburger.setAttribute('aria-expanded', 'true');
+/* =================================================================
+   LIVE DATELINE (top-right of masthead)
+   ================================================================= */
+const datelineRight = document.getElementById('datelineRight');
+function updateDateline() {
+  if (!datelineRight) return;
+  const now = new Date();
+  const opts = { month: 'long', day: 'numeric', year: 'numeric' };
+  datelineRight.textContent = now.toLocaleDateString('en-US', opts);
 }
-function closeDrawer() {
-  drawer.classList.remove('open');
-  drawerOverlay.classList.remove('open');
-  drawer.setAttribute('aria-hidden', 'true');
-  hamburger.setAttribute('aria-expanded', 'false');
-}
+updateDateline();
 
-if (hamburger) hamburger.addEventListener('click', () => drawer.classList.contains('open') ? closeDrawer() : openDrawer());
-if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
-if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
-
-/* =============================================
+/* =================================================================
    TYPEWRITER EFFECT
-   ============================================= */
+   ================================================================= */
 const roles = [
   'Web Developer',
   'System Engineer',
@@ -206,7 +131,7 @@ function typeWriter() {
     charIndex++;
   }
 
-  let delay = isDeleting ? 58 : 98;
+  let delay = isDeleting ? 55 : 95;
 
   if (!isDeleting && charIndex === currentRole.length) {
     delay = 1800;
@@ -219,21 +144,20 @@ function typeWriter() {
 
   setTimeout(typeWriter, delay);
 }
+setTimeout(typeWriter, 1100);
 
-setTimeout(typeWriter, 900);
-
-/* =============================================
+/* =================================================================
    GREETING BUTTON
-   ============================================= */
+   ================================================================= */
 const greetings = [
-  '"Code is poetry. Let\'s write something beautiful together."',
-  '"Hello! I turn coffee and curiosity into working software."',
-  '"Mabuhay! Ready to build something great?"',
-  '"From Cebu with clean code and creative design."',
-  '"Full stack, fully committed — let\'s talk!"',
-  '"Great design is invisible. Great code is the same."',
-  '"Hardware or software — I speak both languages."',
-  '"Let\'s collaborate and ship something worth showing off."'
+  'Code is poetry. Let\u2019s write something beautiful together.',
+  'Hello! I turn coffee and curiosity into working software.',
+  'Mabuhay! Ready to build something great?',
+  'From Cebu with clean code and creative design.',
+  'Full stack, fully committed \u2014 let\u2019s talk!',
+  'Great design is invisible. Great code is the same.',
+  'Hardware or software \u2014 I speak both languages.',
+  'Let\u2019s collaborate and ship something worth showing off.'
 ];
 
 const greetBtn    = document.getElementById('greetBtn');
@@ -247,75 +171,83 @@ function showGreeting() {
   while (idx === lastGreeting && greetings.length > 1);
   lastGreeting = idx;
 
-  greetingBox.style.opacity = '0';
+  greetingBox.classList.remove('visible');
   setTimeout(() => {
-    greetingBox.textContent = greetings[idx];
+    greetingBox.textContent = '\u201C' + greetings[idx] + '\u201D';
     greetingBox.classList.add('visible');
-    greetingBox.style.opacity = '1';
-  }, 200);
+  }, 150);
 }
-
 if (greetBtn) greetBtn.addEventListener('click', showGreeting);
 
-/* =============================================
-   SKILL POPUP / MODAL SYSTEM
-   ============================================= */
+/* =================================================================
+   SKILL DEFINITION MODAL
+   ================================================================= */
 const skillDescriptions = {
-  'C#': 'C# (C-Sharp) is a modern, object-oriented language developed by Microsoft. It\'s used for Windows apps, web services, and games built on Unity. I use it to create robust backend services and cross-platform applications.',
-  'C': 'C is a powerful low-level language that gives direct access to memory and hardware. It\'s the foundation of many operating systems. I use C for system-level programming and embedded logic.',
+  'C#': 'C# (C-Sharp) is a modern, object-oriented language developed by Microsoft. It\u2019s used for Windows apps, web services, and games built on Unity. I use it to create robust backend services and cross-platform applications.',
+  'C': 'C is a powerful low-level language that gives direct access to memory and hardware. It\u2019s the foundation of many operating systems. I use C for system-level programming and embedded logic.',
   'Java': 'Java is a versatile, object-oriented language known for its "write once, run anywhere" capability. I use Java to build scalable, platform-independent applications.',
   'HTML': 'HTML is the structural backbone of every web page. I write semantic, accessible, SEO-friendly markup that works as a solid foundation for any UI.',
   'CSS': 'CSS controls layout, typography, color, and responsiveness. I use it to craft polished, mobile-first interfaces that feel great on any device.',
   'JavaScript': 'JavaScript brings interactivity to the web and powers both frontend and backend via Node.js. I use it to build dynamic, engaging applications.',
-  'Python': 'Python\'s readability and versatility make it great for web development, automation, and data work. I use it for scripting, APIs, and data processing.',
+  'Python': 'Python\u2019s readability and versatility make it great for web development, automation, and data work. I use it for scripting, APIs, and data processing.',
   'SQL': 'SQL is the language of relational databases. I write efficient schemas and complex queries to power data-driven applications.',
   'Full Stack Dev': 'Full Stack Development means owning both the frontend and backend. I connect the user interface to servers, databases, and APIs to deliver complete products.',
-  'Adobe Photoshop': 'Photoshop is my go-to for photo editing, compositing, and raster graphic design — creating visual assets that look polished at every resolution.',
-  'Adobe Illustrator': 'Illustrator handles vector graphics — logos, icons, and illustrations — so designs scale crisply from a favicon to a billboard.',
+  'Adobe Photoshop': 'Photoshop is my go-to for photo editing, compositing, and raster graphic design \u2014 creating visual assets that look polished at every resolution.',
+  'Adobe Illustrator': 'Illustrator handles vector graphics \u2014 logos, icons, and illustrations \u2014 so designs scale crisply from a favicon to a billboard.',
   'Adobe After Effects': 'After Effects lets me create motion graphics, animated transitions, and visual effects for web and video content.',
   'UI Design': 'UI Design is about making interfaces intuitive and beautiful. I design with both aesthetics and accessibility in mind, ensuring every screen serves its user.',
-  'Hardware & Circuits': 'Understanding hardware gives me insight into how software talks to physical systems — from microcontrollers to sensors to integrated electronics.',
+  'Hardware & Circuits': 'Understanding hardware gives me insight into how software talks to physical systems \u2014 from microcontrollers to sensors to integrated electronics.',
   'System Engineering': 'System Engineering is the holistic practice of designing and managing complex systems where hardware, software, and processes intersect.',
-  'BPO / Customer Service': 'Three years in BPO sharpened my communication, empathy, and problem-solving — skills that directly inform how I think about user needs in my software.',
+  'BPO / Customer Service': 'Three years in BPO sharpened my communication, empathy, and problem-solving \u2014 skills that directly inform how I think about user needs in my software.',
   'Telecommunications': 'Supporting telecom customers gave me hands-on knowledge of networking concepts, billing systems, and service workflows.',
   'Healthcare Support': 'Working in healthcare BPO taught me HIPAA-adjacent data sensitivity and the high stakes of clear, accurate patient communication.',
-  'E-Commerce': 'I\'ve supported orders and disputes across Cartpanda, Buygoods, DigiStore, and Shopify — giving me practical insight into digital commerce flows.',
+  'E-Commerce': 'I\u2019ve supported orders and disputes across Cartpanda, Buygoods, DigiStore, and Shopify \u2014 giving me practical insight into digital commerce flows.',
   'Persuasive Communication': 'Whether pitching a design, explaining a technical decision, or de-escalating a customer, clear and compelling communication is the skill that makes everything else land.',
-  'MS Office Suite': 'Word for documentation, Excel for data analysis and reporting, PowerPoint for presentations — I use the Office suite efficiently for professional deliverables.'
+  'MS Office Suite': 'Word for documentation, Excel for data analysis and reporting, PowerPoint for presentations \u2014 I use the Office suite efficiently for professional deliverables.'
 };
 
-const skillModal      = document.getElementById('skillModal');
-const skillModalTitle = document.getElementById('skillModalTitle');
-const skillModalDesc  = document.getElementById('skillModalDesc');
-const skillModalClose = document.getElementById('skillModalClose');
+const skillModal       = document.getElementById('skillModal');
+const skillModalTitle  = document.getElementById('skillModalTitle');
+const skillModalDesc   = document.getElementById('skillModalDesc');
+const skillModalClose  = document.getElementById('skillModalClose');
 const skillModalOverlay = document.getElementById('skillModalOverlay');
 
 function openSkillModal(name) {
   if (!skillModal) return;
   skillModalTitle.textContent = name;
-  skillModalDesc.textContent  = skillDescriptions[name] || `${name} is a key part of my toolkit.`;
+  skillModalDesc.textContent  = skillDescriptions[name] || (name + ' is a key part of my toolkit.');
   skillModal.classList.add('open');
   skillModal.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
 }
-
 function closeSkillModal() {
   if (!skillModal) return;
   skillModal.classList.remove('open');
   skillModal.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = '';
 }
-
 if (skillModalClose) skillModalClose.addEventListener('click', closeSkillModal);
 if (skillModalOverlay) skillModalOverlay.addEventListener('click', closeSkillModal);
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && skillModal && skillModal.classList.contains('open')) closeSkillModal();
 });
 
-/* Attach to all skill tags */
-document.querySelectorAll('.skill-tag').forEach(tag => {
-  tag.addEventListener('click', e => {
-    e.stopPropagation();
-    openSkillModal(tag.textContent.trim());
+document.querySelectorAll('.index-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const name = item.getAttribute('data-skill') || item.querySelector('.index-item__name').textContent.trim();
+    openSkillModal(name);
+  });
+});
+
+/* =================================================================
+   SMOOTH ANCHOR SCROLL OFFSET (account for sticky nav)
+   ================================================================= */
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+  link.addEventListener('click', (e) => {
+    const id = link.getAttribute('href').slice(1);
+    const target = document.getElementById(id);
+    if (!target) return;
+    e.preventDefault();
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 });
