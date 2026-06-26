@@ -122,8 +122,6 @@ if (hamburger && navLinks) {
 
 
 /* ---------- INTERSECTION OBSERVER (REVEAL) ---------- */
-// This is now optional since we made everything visible by default in CSS
-// But we keep it for smooth animations when elements do become visible
 const observerOptions = {
   threshold: 0.12,
   rootMargin: '0px 0px -40px 0px'
@@ -132,7 +130,6 @@ const observerOptions = {
 const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry, i) => {
     if (entry.isIntersecting) {
-      // Staggered delay for grouped elements
       const delay = parseInt(entry.target.dataset.delay) || 0;
       setTimeout(() => {
         entry.target.classList.add('visible');
@@ -142,25 +139,20 @@ const observer = new IntersectionObserver((entries) => {
   });
 }, observerOptions);
 
-// Observe timeline items (staggered)
 document.querySelectorAll('.timeline__item').forEach((el, i) => {
   el.dataset.delay = i * 120;
   observer.observe(el);
 });
 
-// Observe edu cards (staggered)
 document.querySelectorAll('.edu-card').forEach((el, i) => {
   el.dataset.delay = i * 80;
   observer.observe(el);
 });
 
-// Generic reveal elements
 document.querySelectorAll('.reveal').forEach(el => {
   observer.observe(el);
 });
 
-// Force visibility for any elements that might have been missed
-// This ensures everything shows even if Intersection Observer fails
 setTimeout(() => {
   document.querySelectorAll('.timeline__item, .edu-card, .reveal').forEach(el => {
     el.classList.add('visible');
@@ -186,7 +178,6 @@ if (sections.length && links.length) {
   sections.forEach(sec => sectionObserver.observe(sec));
 }
 
-// Add active style dynamically (already in CSS, but keep as fallback)
 const style = document.createElement('style');
 style.textContent = `.nav__link.active { color: var(--coral) !important; }`;
 document.head.appendChild(style);
@@ -201,15 +192,12 @@ document.querySelectorAll('.skill-tag').forEach(tag => {
 
 
 /* ---------- FALLBACK: Ensure Experience & Education are visible ---------- */
-// Additional safety net to ensure sections are visible
 document.addEventListener('DOMContentLoaded', function() {
-  // Force visibility of all timeline items and edu cards
   document.querySelectorAll('.timeline__item, .edu-card').forEach(el => {
     el.classList.add('visible');
   });
 });
 
-// Also run after a short delay to catch any dynamically added content
 setTimeout(() => {
   document.querySelectorAll('.timeline__item, .edu-card').forEach(el => {
     if (!el.classList.contains('visible')) {
@@ -270,7 +258,6 @@ const skillDescriptions = {
 
 /* ---- Create Modal ---- */
 function createSkillModal() {
-  // Check if modal already exists
   if (document.getElementById('skillModal')) return;
 
   const modal = document.createElement('div');
@@ -291,7 +278,6 @@ function createSkillModal() {
 
   document.body.appendChild(modal);
 
-  // Close handlers
   const closeBtn = document.getElementById('skillModalClose');
   const overlay = document.getElementById('skillModalOverlay');
 
@@ -322,33 +308,31 @@ function showSkillPopup(skillName) {
 
   if (!modal || !title || !desc) return;
 
-  // Find the description, or use a fallback
   const description = skillDescriptions[skillName] || `${skillName} is a valuable skill in my toolkit.`;
 
   title.textContent = skillName;
   desc.textContent = description;
 
+  // If modal is already visible, just update content without flicker
+  if (modal.style.display === 'flex') {
+    return;
+  }
+
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
 
-/* ---- SKILL CLICK HANDLERS (FIXED) ---- */
-let skillHandlersSetup = false;
-
+/* ---- SKILL CLICK HANDLERS (FIXED - one listener per tag) ---- */
 function setupSkillClickHandlers() {
-  if (skillHandlersSetup) return;
-  skillHandlersSetup = true;
-
-  // Use a more robust approach: attach event listener directly on parent container (event delegation)
-  // This avoids duplicate listeners and handles dynamically added tags automatically.
-  const skillTagContainer = document.querySelector('.skills__groups');
-  if (!skillTagContainer) return;
-
-  skillTagContainer.addEventListener('click', function(e) {
-    const tag = e.target.closest('.skill-tag');
-    if (!tag) return;
-    const skillName = tag.textContent.trim();
-    showSkillPopup(skillName);
+  const skillTags = document.querySelectorAll('.skill-tag:not([data-listener])');
+  skillTags.forEach(tag => {
+    tag.setAttribute('data-listener', 'true');
+    tag.style.cursor = 'pointer';
+    tag.addEventListener('click', function(e) {
+      e.stopPropagation(); // prevent any accidental parent clicks
+      const skillName = this.textContent.trim();
+      showSkillPopup(skillName);
+    });
   });
 }
 
@@ -357,6 +341,4 @@ document.addEventListener('DOMContentLoaded', function() {
   setupSkillClickHandlers();
 });
 
-/* ---- Also handle if skills are added later (though unlikely) ---- */
-// We don't need a MutationObserver now because event delegation covers it.
-// The observer is removed to prevent duplicate event listeners.
+/* ---- No MutationObserver needed to prevent duplicate listeners ---- */
