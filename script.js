@@ -204,7 +204,7 @@ setTimeout(() => {
 
 
 /* =============================================
-   SKILL POPUP / MODAL SYSTEM (COMPLETELY REWRITTEN)
+   SKILL POPUP / MODAL SYSTEM (COMPLETELY REWRITTEN WITH FLAG)
    ============================================= */
 
 /* ---- Skill descriptions ---- */
@@ -252,9 +252,12 @@ const skillDescriptions = {
   'MS Office Suite': 'Microsoft Office Suite includes Word, Excel, PowerPoint, and other productivity tools. I use these for documentation, data analysis, presentations, and professional communication.'
 };
 
-/* ---- Create the modal ONCE when the page loads ---- */
+/* ---- Modal state management ---- */
+let isModalOpen = false;
+let modalTimeout = null;
+
+/* ---- Create the modal ONCE ---- */
 function createModal() {
-  // Only create if it doesn't exist
   if (document.getElementById('skillModal')) return;
 
   const modal = document.createElement('div');
@@ -280,32 +283,47 @@ function createModal() {
   const overlay = document.getElementById('skillModalOverlay');
 
   function closeModal() {
-    const modalEl = document.getElementById('skillModal');
-    if (modalEl) modalEl.style.display = 'none';
+    if (modalTimeout) {
+      clearTimeout(modalTimeout);
+      modalTimeout = null;
+    }
+    modal.style.display = 'none';
     document.body.style.overflow = '';
+    isModalOpen = false;
   }
 
-  if (closeBtn) closeBtn.addEventListener('click', closeModal);
-  if (overlay) overlay.addEventListener('click', closeModal);
+  if (closeBtn) closeBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    closeModal();
+  });
+  
+  if (overlay) overlay.addEventListener('click', function(e) {
+    e.stopPropagation();
+    closeModal();
+  });
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      const modalEl = document.getElementById('skillModal');
-      if (modalEl && modalEl.style.display === 'block') closeModal();
+    if (e.key === 'Escape' && isModalOpen) {
+      closeModal();
     }
   });
 }
 
 /* ---- Show skill popup ---- */
 function showSkillPopup(skillName) {
+  // Prevent multiple calls while a modal is already open or being processed
+  if (isModalOpen || modalTimeout) return;
+
   const modal = document.getElementById('skillModal');
   const title = document.getElementById('skillModalTitle');
   const desc  = document.getElementById('skillModalDesc');
 
   if (!modal || !title || !desc) {
-    // If modal doesn't exist for some reason, create it and try again
     createModal();
-    setTimeout(() => showSkillPopup(skillName), 50);
+    // Try again after a small delay
+    modalTimeout = setTimeout(() => {
+      showSkillPopup(skillName);
+    }, 100);
     return;
   }
 
@@ -315,46 +333,34 @@ function showSkillPopup(skillName) {
   desc.textContent = description;
 
   // Show the modal
+  isModalOpen = true;
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
 
-/* ---- CLOSE MODAL FUNCTION ---- */
-function closeModal() {
-  const modal = document.getElementById('skillModal');
-  if (modal) {
-    modal.style.display = 'none';
-    document.body.style.overflow = '';
-  }
-}
-
-/* ---- SKILL CLICK HANDLERS (FIXED - using event delegation with a single listener) ---- */
+/* ---- SKILL CLICK HANDLERS (FIXED) ---- */
 document.addEventListener('DOMContentLoaded', function() {
   // Create the modal once
   createModal();
 
-  // Use event delegation: one listener on the document
+  // Use event delegation with a single listener
   document.addEventListener('click', function(e) {
-    // Find if the click was on a skill tag or inside one
+    // Find if the click was on a skill tag
     const tag = e.target.closest('.skill-tag');
     if (tag) {
-      // Prevent any other click handlers from interfering
+      // Prevent the click from bubbling to avoid any parent handlers
       e.stopPropagation();
       
-      // Get the skill name and show the popup
+      // If a modal is already open, don't open another
+      if (isModalOpen) return;
+
+      // Get the skill name
       const skillName = tag.textContent.trim();
       
-      // Small delay to ensure any other events are processed first
-      setTimeout(() => {
-        showSkillPopup(skillName);
-      }, 10);
+      // Show the popup
+      showSkillPopup(skillName);
     }
   });
 });
 
-// Also close the modal when clicking outside the box (on the overlay)
-// This is already handled in createModal() via the overlay click
-
-/* ---- Make sure the modal can be closed properly ---- */
-// Expose close function globally for debugging if needed
-window.closeModal = closeModal;
+console.log('✅ Skill popup system initialized with proper state management.');
