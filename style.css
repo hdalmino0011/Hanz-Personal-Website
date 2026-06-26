@@ -86,6 +86,7 @@ ul { list-style: none; }
   transition: color var(--transition);
 }
 .nav__link:hover { color: var(--coral); }
+.nav__link.active { color: var(--coral) !important; }
 
 .nav__hamburger {
   display: none;
@@ -433,8 +434,8 @@ ul { list-style: none; }
 .timeline__item {
   position: relative;
   margin-bottom: 3.2rem;
-  opacity: 0;
-  transform: translateX(-20px);
+  opacity: 1; /* Changed from 0 to 1 to always show */
+  transform: translateX(0); /* Changed from -20px to 0 to always show */
   transition: opacity 0.5s ease, transform 0.5s ease;
 }
 .timeline__item.visible {
@@ -519,8 +520,8 @@ ul { list-style: none; }
   overflow: hidden;
   box-shadow: var(--shadow-sm);
   transition: transform var(--transition), box-shadow var(--transition);
-  opacity: 0;
-  transform: translateY(20px);
+  opacity: 1; /* Changed from 0 to 1 to always show */
+  transform: translateY(0); /* Changed from 20px to 0 to always show */
 }
 .edu-card.visible {
   opacity: 1;
@@ -635,8 +636,8 @@ ul { list-style: none; }
 
 /* ---------- SCROLL REVEAL ---------- */
 .reveal {
-  opacity: 0;
-  transform: translateY(24px);
+  opacity: 1; /* Changed from 0 to 1 to always show */
+  transform: translateY(0); /* Changed from 24px to 0 to always show */
   transition: opacity 0.55s ease, transform 0.55s ease;
 }
 .reveal.visible {
