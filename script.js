@@ -32,7 +32,7 @@ function typeWriter() {
   let delay = isDeleting ? 60 : 100;
 
   if (!isDeleting && charIndex === currentRole.length) {
-    delay = 1800; // pause before deleting
+    delay = 1800;
     isDeleting = true;
   } else if (isDeleting && charIndex === 0) {
     isDeleting = false;
@@ -89,21 +89,18 @@ const nav        = document.getElementById('nav');
 const hamburger  = document.getElementById('hamburger');
 const navLinks   = document.getElementById('navLinks');
 
-// Scrolled state
 if (nav) {
   window.addEventListener('scroll', () => {
     nav.classList.toggle('scrolled', window.scrollY > 40);
   }, { passive: true });
 }
 
-// Mobile toggle
 if (hamburger && navLinks) {
   hamburger.addEventListener('click', () => {
     const isOpen = navLinks.classList.toggle('open');
     hamburger.setAttribute('aria-expanded', isOpen);
   });
 
-  // Close menu on link click
   navLinks.querySelectorAll('.nav__link').forEach(link => {
     link.addEventListener('click', () => {
       navLinks.classList.remove('open');
@@ -111,7 +108,6 @@ if (hamburger && navLinks) {
     });
   });
 
-  // Close menu on outside click
   document.addEventListener('click', e => {
     if (!nav.contains(e.target) && navLinks.classList.contains('open')) {
       navLinks.classList.remove('open');
@@ -208,7 +204,7 @@ setTimeout(() => {
 
 
 /* =============================================
-   SKILL POPUP / MODAL SYSTEM (FIXED)
+   SKILL POPUP / MODAL SYSTEM (COMPLETELY REWRITTEN)
    ============================================= */
 
 /* ---- Skill descriptions ---- */
@@ -256,8 +252,9 @@ const skillDescriptions = {
   'MS Office Suite': 'Microsoft Office Suite includes Word, Excel, PowerPoint, and other productivity tools. I use these for documentation, data analysis, presentations, and professional communication.'
 };
 
-/* ---- Create Modal ---- */
-function createSkillModal() {
+/* ---- Create the modal ONCE when the page loads ---- */
+function createModal() {
+  // Only create if it doesn't exist
   if (document.getElementById('skillModal')) return;
 
   const modal = document.createElement('div');
@@ -278,6 +275,7 @@ function createSkillModal() {
 
   document.body.appendChild(modal);
 
+  // Close handlers
   const closeBtn = document.getElementById('skillModalClose');
   const overlay = document.getElementById('skillModalOverlay');
 
@@ -300,45 +298,63 @@ function createSkillModal() {
 
 /* ---- Show skill popup ---- */
 function showSkillPopup(skillName) {
-  createSkillModal();
-
   const modal = document.getElementById('skillModal');
   const title = document.getElementById('skillModalTitle');
   const desc  = document.getElementById('skillModalDesc');
 
-  if (!modal || !title || !desc) return;
+  if (!modal || !title || !desc) {
+    // If modal doesn't exist for some reason, create it and try again
+    createModal();
+    setTimeout(() => showSkillPopup(skillName), 50);
+    return;
+  }
 
   const description = skillDescriptions[skillName] || `${skillName} is a valuable skill in my toolkit.`;
 
   title.textContent = skillName;
   desc.textContent = description;
 
-  // If modal is already visible, just update content without flicker
-  if (modal.style.display === 'flex') {
-    return;
-  }
-
+  // Show the modal
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
 
-/* ---- SKILL CLICK HANDLERS (FIXED - one listener per tag) ---- */
-function setupSkillClickHandlers() {
-  const skillTags = document.querySelectorAll('.skill-tag:not([data-listener])');
-  skillTags.forEach(tag => {
-    tag.setAttribute('data-listener', 'true');
-    tag.style.cursor = 'pointer';
-    tag.addEventListener('click', function(e) {
-      e.stopPropagation(); // prevent any accidental parent clicks
-      const skillName = this.textContent.trim();
-      showSkillPopup(skillName);
-    });
-  });
+/* ---- CLOSE MODAL FUNCTION ---- */
+function closeModal() {
+  const modal = document.getElementById('skillModal');
+  if (modal) {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
 }
 
-/* ---- Initialize skill click handlers on DOM ready ---- */
+/* ---- SKILL CLICK HANDLERS (FIXED - using event delegation with a single listener) ---- */
 document.addEventListener('DOMContentLoaded', function() {
-  setupSkillClickHandlers();
+  // Create the modal once
+  createModal();
+
+  // Use event delegation: one listener on the document
+  document.addEventListener('click', function(e) {
+    // Find if the click was on a skill tag or inside one
+    const tag = e.target.closest('.skill-tag');
+    if (tag) {
+      // Prevent any other click handlers from interfering
+      e.stopPropagation();
+      
+      // Get the skill name and show the popup
+      const skillName = tag.textContent.trim();
+      
+      // Small delay to ensure any other events are processed first
+      setTimeout(() => {
+        showSkillPopup(skillName);
+      }, 10);
+    }
+  });
 });
 
-/* ---- No MutationObserver needed to prevent duplicate listeners ---- */
+// Also close the modal when clicking outside the box (on the overlay)
+// This is already handled in createModal() via the overlay click
+
+/* ---- Make sure the modal can be closed properly ---- */
+// Expose close function globally for debugging if needed
+window.closeModal = closeModal;
