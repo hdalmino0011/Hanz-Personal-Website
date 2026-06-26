@@ -64,12 +64,49 @@ ul { list-style: none; }
 }
 .nav.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.25); }
 
+/* ---- HDDev Logo (stylish) ---- */
 .nav__logo {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 1.5rem;
+  font-size: 1.7rem;
+  letter-spacing: 0.03em;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+  position: relative;
+  cursor: default;
+}
+.nav__logo .logo-hd {
   color: var(--white);
-  letter-spacing: 0.05em;
+  position: relative;
+}
+.nav__logo .logo-hd::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--coral);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s var(--transition);
+}
+.nav__logo:hover .logo-hd::after {
+  transform: scaleX(1);
+}
+.nav__logo .logo-dev {
+  color: var(--coral);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+  margin-left: 2px;
+  transition: color 0.3s;
+}
+.nav__logo:hover .logo-dev {
+  color: var(--teal);
 }
 
 .nav__links {
@@ -645,6 +682,72 @@ ul { list-style: none; }
   transform: translateY(0);
 }
 
+/* =============================================
+   SKILL MODAL (POPUP)
+   ============================================= */
+.skill-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none; /* will be set to flex by JS */
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+.skill-modal__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.skill-modal__box {
+  position: relative;
+  max-width: 540px;
+  width: 100%;
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 2.2rem 2.2rem 2rem;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+  animation: modalPop 0.3s var(--transition);
+  z-index: 1;
+}
+@keyframes modalPop {
+  0% { opacity: 0; transform: scale(0.92) translateY(20px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.skill-modal__close {
+  position: absolute;
+  top: 0.8rem;
+  right: 1.2rem;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--grey-md);
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+}
+.skill-modal__close:hover {
+  color: var(--coral);
+  transform: rotate(90deg);
+}
+.skill-modal__title {
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 0.8rem;
+  padding-right: 2rem;
+}
+.skill-modal__desc {
+  font-size: 1rem;
+  color: var(--charcoal);
+  line-height: 1.8;
+  margin-bottom: 0.5rem;
+}
+
 /* ---------- RESPONSIVE ---------- */
 @media (max-width: 900px) {
   .about__body {
@@ -704,6 +807,13 @@ ul { list-style: none; }
 
   .contact__cards { flex-direction: column; }
   .contact-card { width: 100%; }
+
+  .skill-modal__box {
+    padding: 1.8rem;
+  }
+  .skill-modal__title {
+    font-size: 1.3rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
